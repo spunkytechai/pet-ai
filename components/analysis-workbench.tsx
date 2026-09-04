@@ -57,6 +57,7 @@ export function AnalysisWorkbench() {
     try {
       const response = await fetch('/api/analyze', { method: 'POST', body: form })
       const data = await response.json()
+      if (!response.ok) throw new Error(data?.alternative_interpretations?.[0] || 'Analysis failed')
       setResult(data)
     } catch {
       setFeedback('Analysis could not be completed. Please try again.')
@@ -85,7 +86,7 @@ export function AnalysisWorkbench() {
         <div className="eyebrow">01 · Capture</div><h2>Record or upload a pet signal</h2>
         <div className="actions"><AudioRecorder onAudioReady={acceptAudio} disabled={busy} /><button className="secondary" type="button" onClick={() => inputRef.current?.click()} disabled={busy}>{t.upload}</button><input ref={inputRef} hidden type="file" accept="audio/*" onChange={(e) => e.target.files?.[0] && acceptAudio(e.target.files[0])} /></div>
         {file && <div className="audio-preview"><strong>{file.name}</strong><span>{(file.size / 1024).toFixed(0)} KB</span>{preview && <audio controls src={preview} />}</div>}
-        <p className="muted">Your browser records using the MediaRecorder API; supported browsers can capture a microphone stream and return it as an audio Blob for processing. citeturn0search0turn0search3</p>
+        <p className="muted">Your browser records using the MediaRecorder API; supported browsers can capture a microphone stream and return it as an audio Blob for processing.</p>
       </div>
 
       <div className="card"><div className="eyebrow">02 · Interpret</div><h2>Analyze the signal</h2><p className="muted">PET AI will return a probabilistic interpretation, not a literal translation.</p><button className="primary" onClick={analyze} disabled={!file || busy}>{busy ? 'Analyzing…' : t.analyze}</button></div>
