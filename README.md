@@ -74,7 +74,6 @@ Production build:
 
 ```bash
 npm run build
-npm start
 ```
 
 ## Supabase
@@ -84,6 +83,10 @@ The production project uses a versioned migration baseline under `supabase/migra
 For email confirmation, configure the Supabase **Confirm signup** template to route through:
 
 `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email`
+
+## Deployment verification
+
+The repository is connected to the PET AI Vercel project. Changes pushed to `main` should be validated through both GitHub Actions and the resulting Vercel production deployment.
 
 ## Safety and research
 
