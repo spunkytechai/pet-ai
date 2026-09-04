@@ -19,13 +19,15 @@ export async function proxy(request: NextRequest) {
   )
 
   const { data: { claims } } = await supabase.auth.getClaims()
-  const isProtected = request.nextUrl.pathname.startsWith('/analyze') || request.nextUrl.pathname.startsWith('/pet')
-  const isAuthPage = request.nextUrl.pathname === '/login' || request.nextUrl.pathname === '/signup'
+  const path = request.nextUrl.pathname
+  const isProtected = path.startsWith('/analyze') || path.startsWith('/pet') || path.startsWith('/history') || path.startsWith('/api/analyze') || path.startsWith('/api/history') || path.startsWith('/api/feedback') || path.startsWith('/api/pets')
+  const isAuthPage = path === '/login' || path === '/signup'
 
   if (isProtected && !claims) {
+    if (path.startsWith('/api/')) return NextResponse.json({ error: 'Authentication required.' }, { status: 401 })
     const url = request.nextUrl.clone()
     url.pathname = '/login'
-    url.searchParams.set('next', request.nextUrl.pathname)
+    url.searchParams.set('next', path)
     return NextResponse.redirect(url)
   }
 
