@@ -16,6 +16,18 @@ export const InterpretationSchema = z.object({
 
 export type Interpretation = z.infer<typeof InterpretationSchema>
 
-export function abstain(reason = 'Insufficient evidence') : Interpretation {
-  return {species:'unknown',vocalization_type:'unknown',signals:[],likely_intent:'UNKNOWN / INSUFFICIENT_EVIDENCE',emotional_state:'unknown',confidence:0,alternative_interpretations:[reason],context_used:[],safety_flag:false,model_version:'mvp-rule-engine-0.1',language:'en'}
+export function abstain(reason = 'Insufficient evidence'): Interpretation {
+  return {
+    species: 'unknown',
+    vocalization_type: 'unknown',
+    signals: [],
+    likely_intent: 'UNKNOWN / INSUFFICIENT_EVIDENCE',
+    emotional_state: 'unknown',
+    confidence: 0,
+    alternative_interpretations: [reason],
+    context_used: [],
+    safety_flag: false,
+    model_version: 'pet-ai-abstention-1.0',
+    language: 'en',
+  }
 }
