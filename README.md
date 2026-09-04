@@ -1,25 +1,24 @@
 # PET AI
 
-AI-assisted pet communication platform.
+**AI-assisted pet communication.**
 
-## Product principle
-PET AI provides probabilistic interpretations of pet vocalizations and context. It does **not** claim literal or exact translation of animal language and is not a veterinary diagnostic tool.
+PET AI analyzes pet vocalizations and context to produce probabilistic interpretations. It does not claim literal animal-language translation and is not a veterinary diagnostic service.
 
-## MVP flow
+## Current MVP
+- Next.js App Router + TypeScript
+- Pet onboarding UI
+- Sample sound-analysis flow
+- Structured interpretation contract with abstention
+- English/Hindi-ready output contract
+- PostgreSQL/Supabase migration foundation
+- Vercel deployment configuration
 
-Create Pet → Record/Upload Sound → Validate Audio → Analyze Signals → Interpret with Context → Confidence + Alternatives → English/Hindi → Owner Feedback → Pet Memory
+## Run
 
-## Architecture
+`npm install`
 
-- Next.js + TypeScript
-- Vercel
-- AI orchestration via Vercel AI SDK / AI Gateway
-- PostgreSQL
-- Supabase Auth + Storage (planned)
-- Pet-specific memory and evaluation layer
+`npm run dev`
 
-## Development status
+## Safety
 
-Phase 1: repository and product foundation.
-
-See `docs/ARCHITECTURE.md` and `docs/ROADMAP.md`.
+Every interpretation should expose confidence, alternative hypotheses, context used and model version. The system can return `UNKNOWN / INSUFFICIENT_EVIDENCE`. Persistent, unusual or severe distress should be assessed by a qualified veterinarian.
