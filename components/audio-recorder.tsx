@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { normalizeAudioForAnalysis } from './audio-utils'
 
 type Props = {
   onAudioReady: (file: File) => void
@@ -41,12 +42,17 @@ export function AudioRecorder({ onAudioReady, disabled = false }: Props) {
         if (event.data.size) chunksRef.current.push(event.data)
       }
       recorder.onerror = () => setError('Recording failed. Please try again or upload a file.')
-      recorder.onstop = () => {
+      recorder.onstop = async () => {
         const duration = Math.round((Date.now() - startedAtRef.current) / 1000)
         const blob = new Blob(chunksRef.current, { type: recorder.mimeType || 'audio/webm' })
         if (blob.size) {
-          const extension = (recorder.mimeType || '').includes('mp4') ? 'm4a' : 'webm'
-          onAudioReady(new File([blob], `pet-signal-${Date.now()}.${extension}`, { type: blob.type }))
+          try {
+            const rawFile = new File([blob], `pet-signal-${Date.now()}.${(recorder.mimeType || '').includes('mp4') ? 'm4a' : 'webm'}`, { type: blob.type })
+            const normalized = await normalizeAudioForAnalysis(rawFile)
+            onAudioReady(normalized)
+          } catch (conversionError) {
+            setError(conversionError instanceof Error ? conversionError.message : 'Recorded audio could not be prepared for analysis.')
+          }
         }
         stream.getTracks().forEach((track) => track.stop())
         streamRef.current = null
