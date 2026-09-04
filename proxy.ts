@@ -18,7 +18,8 @@ export async function proxy(request: NextRequest) {
     },
   )
 
-  const { data: { claims } } = await supabase.auth.getClaims()
+  const { data: claimsData } = await supabase.auth.getClaims()
+  const claims = claimsData?.claims
   const path = request.nextUrl.pathname
   const isProtected = path.startsWith('/analyze') || path.startsWith('/pet') || path.startsWith('/history') || path.startsWith('/api/analyze') || path.startsWith('/api/history') || path.startsWith('/api/feedback') || path.startsWith('/api/pets')
   const isAuthPage = path === '/login' || path === '/signup'
