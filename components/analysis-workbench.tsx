@@ -4,6 +4,9 @@ import { useRef, useState } from 'react'
 import { AudioRecorder } from './audio-recorder'
 
 type Result = {
+  id: string
+  pet_id: string
+  recording_id: string
   species: string
   vocalization_type: string
   signals: string[]
@@ -15,8 +18,6 @@ type Result = {
   safety_flag: boolean
   model_version: string
   language: 'en' | 'hi'
-  abstained?: boolean
-  abstention_reason?: string
 }
 
 const copy = {
@@ -38,6 +39,14 @@ export function AnalysisWorkbench() {
   const t = copy[language]
 
   function acceptAudio(nextFile: File) {
+    if (!nextFile.type.startsWith('audio/')) {
+      setFeedback('Please choose an audio file.')
+      return
+    }
+    if (nextFile.size > 6 * 1024 * 1024) {
+      setFeedback('Audio must be 6 MB or smaller.')
+      return
+    }
     setFile(nextFile)
     setPreview(URL.createObjectURL(nextFile))
     setResult(null)
@@ -57,18 +66,23 @@ export function AnalysisWorkbench() {
     try {
       const response = await fetch('/api/analyze', { method: 'POST', body: form })
       const data = await response.json()
-      if (!response.ok) throw new Error(data?.alternative_interpretations?.[0] || 'Analysis failed')
+      if (!response.ok) throw new Error(data?.error || data?.alternative_interpretations?.[0] || 'Analysis failed')
       setResult(data)
-    } catch {
-      setFeedback('Analysis could not be completed. Please try again.')
+    } catch (error) {
+      setFeedback(error instanceof Error ? error.message : 'Analysis could not be completed. Please try again.')
     } finally {
       setBusy(false)
     }
   }
 
   async function sendFeedback(value: string) {
-    setFeedback(value)
-    await fetch('/api/feedback', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ rating: value, interpretation: result, pet_name: petName }) }).catch(() => {})
+    if (!result) return
+    const response = await fetch('/api/feedback', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ rating: value, interpretation_id: result.id }),
+    })
+    setFeedback(response.ok ? value : 'Feedback could not be saved. Please try again.')
   }
 
   return (
@@ -91,7 +105,7 @@ export function AnalysisWorkbench() {
 
       <div className="card"><div className="eyebrow">02 · Interpret</div><h2>Analyze the signal</h2><p className="muted">PET AI will return a probabilistic interpretation, not a literal translation.</p><button className="primary" onClick={analyze} disabled={!file || busy}>{busy ? 'Analyzing…' : t.analyze}</button></div>
 
-      {result && <div className="result-card"><div className="eyebrow">03 · PET AI interpretation</div><div className="row-between"><div><span className="result-label">{t.mostLikely}</span><h2>{result.likely_intent}</h2></div><div className="confidence">{Math.round(result.confidence * 100)}%<small>{t.confidence}</small></div></div><p className="emotion">{result.emotional_state}</p><div className="result-grid"><div><strong>{t.signals}</strong><p>{result.signals.join(' · ') || 'Insufficient signal evidence'}</p></div><div><strong>{t.alternatives}</strong><p>{result.alternative_interpretations.join(' · ') || 'None'}</p></div><div><strong>{t.context}</strong><p>{result.context_used.join(' · ') || 'No context supplied'}</p></div></div>{result.safety_flag && <div className="safety"><strong>{t.safety}</strong><p>Persistent, unusual, or severe distress should be assessed by a qualified veterinarian.</p></div>}<p className="notice">AI-assisted interpretation only. This is not literal pet-language translation and not a veterinary diagnosis. Model: {result.model_version}</p><div className="feedback"><span>Was this useful?</span><button onClick={() => sendFeedback('correct')}>{t.correct}</button><button onClick={() => sendFeedback('partly')}>{t.partly}</button><button onClick={() => sendFeedback('incorrect')}>{t.incorrect}</button></div>{feedback && <p className="muted">Feedback recorded: {feedback}</p>}</div>}
+      {result && <div className="result-card"><div className="eyebrow">03 · PET AI interpretation</div><div className="row-between"><div><span className="result-label">{t.mostLikely}</span><h2>{result.likely_intent}</h2></div><div className="confidence">{Math.round(result.confidence * 100)}%<small>{t.confidence}</small></div></div><p className="emotion">{result.emotional_state}</p><div className="result-grid"><div><strong>{t.signals}</strong><p>{result.signals.join(' · ') || 'Insufficient signal evidence'}</p></div><div><strong>{t.alternatives}</strong><p>{result.alternative_interpretations.join(' · ') || 'None'}</p></div><div><strong>{t.context}</strong><p>{result.context_used.join(' · ') || 'No context supplied'}</p></div></div>{result.safety_flag && <div className="safety"><strong>{t.safety}</strong><p>Persistent, unusual, or severe distress should be assessed by a qualified veterinarian.</p></div>}<p className="notice">AI-assisted interpretation only. This is not literal pet-language translation and not a veterinary diagnosis. Model: {result.model_version}</p><div className="feedback"><span>Was this useful?</span><button onClick={() => sendFeedback('correct')}>{t.correct}</button><button onClick={() => sendFeedback('partly')}>{t.partly}</button><button onClick={() => sendFeedback('incorrect')}>{t.incorrect}</button></div>{feedback && <p className="muted">{feedback}</p>}</div>}
     </div>
   )
 }
