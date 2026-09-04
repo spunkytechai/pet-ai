@@ -1,0 +1,1 @@
+export default function Loading(){return <main><div className="container"><section className="hero"><div className="eyebrow">PET AI</div><h1>Preparing your pet workspace…</h1><p>Loading the next step.</p></section></div></main>}

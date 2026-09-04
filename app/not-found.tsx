@@ -1,0 +1,2 @@
+import Link from 'next/link'
+export default function NotFound(){return <main><div className="container"><section className="hero"><div className="eyebrow">PET AI</div><h1>We couldn't find that page.</h1><p>The pet communication workspace you're looking for isn't available at this address.</p><div className="actions"><Link className="primary" href="/">Back to PET AI</Link></div></section></div></main>}

@@ -1,0 +1,84 @@
+'use client'
+
+import { useEffect, useRef, useState } from 'react'
+import { AudioRecorder } from './audio-recorder'
+
+type Pet = { id: string; name: string; species: 'dog' | 'cat'; age_years?: number | null }
+type Result = { id: string; pet_id: string; pet_name: string; recording_id: string; species: string; vocalization_type: string; signals: string[]; likely_intent: string; emotional_state: string; confidence: number; alternative_interpretations: string[]; context_used: string[]; safety_flag: boolean; model_version: string; language: 'en' | 'hi' }
+
+const copy = {
+  en: { mostLikely: 'Most likely', confidence: 'Confidence', signals: 'Signals detected', alternatives: 'Other possibilities', context: 'Context considered', safety: 'Safety note', correct: 'Correct', partly: 'Partly correct', incorrect: 'Not correct', analyze: 'Analyze sound', upload: 'Upload audio', contextLabel: 'What was happening when your pet made this sound?', pet: 'Pet', choosePet: 'Choose a pet', createPet: 'Create a pet profile', emptyPets: 'Create a pet profile first.', signIn: 'Sign in required' },
+  hi: { mostLikely: 'सबसे संभावित अर्थ', confidence: 'विश्वास स्तर', signals: 'पहचाने गए संकेत', alternatives: 'अन्य संभावनाएँ', context: 'विचार किया गया संदर्भ', safety: 'सुरक्षा सूचना', correct: 'सही', partly: 'आंशिक रूप से सही', incorrect: 'सही नहीं', analyze: 'आवाज़ का विश्लेषण करें', upload: 'ऑडियो अपलोड करें', contextLabel: 'जब आपके पालतू ने यह आवाज़ निकाली तब क्या हो रहा था?', pet: 'पालतू', choosePet: 'पालतू चुनें', createPet: 'पालतू प्रोफ़ाइल बनाएं', emptyPets: 'पहले पालतू प्रोफ़ाइल बनाएं।', signIn: 'साइन इन आवश्यक' },
+}
+
+export function AnalysisWorkbench() {
+  const [pets, setPets] = useState<Pet[]>([])
+  const [petId, setPetId] = useState('')
+  const [context, setContext] = useState('')
+  const [file, setFile] = useState<File | null>(null)
+  const [preview, setPreview] = useState('')
+  const [result, setResult] = useState<Result | null>(null)
+  const [busy, setBusy] = useState(false)
+  const [language, setLanguage] = useState<'en' | 'hi'>('en')
+  const [feedback, setFeedback] = useState('')
+  const inputRef = useRef<HTMLInputElement>(null)
+  const t = copy[language]
+  const pet = pets.find((item) => item.id === petId)
+
+  useEffect(() => {
+    fetch('/api/pets')
+      .then((r) => r.json())
+      .then((data) => {
+        if (Array.isArray(data.pets)) {
+          setPets(data.pets)
+          const params = new URLSearchParams(window.location.search)
+          const requested = params.get('pet')
+          setPetId(data.pets.some((p: Pet) => p.id === requested) ? requested! : data.pets[0]?.id ?? '')
+        }
+      })
+      .catch(() => setFeedback('Pets could not be loaded.'))
+  }, [])
+
+  function acceptAudio(nextFile: File) {
+    if (!nextFile.type.startsWith('audio/')) return setFeedback('Please choose an audio file.')
+    if (nextFile.size > 4 * 1024 * 1024) return setFeedback('Audio must be 4 MB or smaller.')
+    setFile(nextFile)
+    setPreview(URL.createObjectURL(nextFile))
+    setResult(null)
+    setFeedback('')
+  }
+
+  async function analyze() {
+    if (!file || !petId) return
+    setBusy(true); setFeedback('')
+    const form = new FormData()
+    form.append('audio', file); form.append('pet_id', petId); form.append('context', context); form.append('language', language)
+    try {
+      const response = await fetch('/api/analyze', { method: 'POST', body: form })
+      const data = await response.json()
+      if (!response.ok) throw new Error(data?.error || data?.alternative_interpretations?.[0] || 'Analysis failed')
+      setResult(data)
+    } catch (error) { setFeedback(error instanceof Error ? error.message : 'Analysis could not be completed.') }
+    finally { setBusy(false) }
+  }
+
+  async function sendFeedback(value: string) {
+    if (!result) return
+    const response = await fetch('/api/feedback', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ rating: value, interpretation_id: result.id }) })
+    setFeedback(response.ok ? `Feedback saved: ${value}.` : 'Feedback could not be saved. Please try again.')
+  }
+
+  return <div className="workbench">
+    <div className="card">
+      <div className="row-between"><div><div className="eyebrow">Pet profile</div><h2>{pet ? `${pet.name} · ${pet.species}` : t.choosePet}</h2></div><div className="language"><button className={language === 'en' ? 'active' : ''} onClick={() => setLanguage('en')}>EN</button><button className={language === 'hi' ? 'active' : ''} onClick={() => setLanguage('hi')}>हिं</button></div></div>
+      {pets.length ? <label>{t.pet}<select value={petId} onChange={(e) => { setPetId(e.target.value); setResult(null) }}>{pets.map((item) => <option key={item.id} value={item.id}>{item.name} · {item.species}</option>)}</select></label> : <p className="muted">{t.emptyPets} <a href="/pet/new">{t.createPet}</a></p>}
+      <label>{t.contextLabel}<textarea value={context} onChange={(e) => setContext(e.target.value)} placeholder="e.g. I had just returned home and my dog was at the door." rows={3} /></label>
+    </div>
+
+    <div className="card"><div className="eyebrow">01 · Capture</div><h2>Record or upload a pet signal</h2><div className="actions"><AudioRecorder onAudioReady={acceptAudio} disabled={busy || !petId} /><button className="secondary" type="button" onClick={() => inputRef.current?.click()} disabled={busy || !petId}>{t.upload}</button><input ref={inputRef} hidden type="file" accept="audio/*" onChange={(e) => e.target.files?.[0] && acceptAudio(e.target.files[0])} /></div>{file && <div className="audio-preview"><strong>{file.name}</strong><span>{(file.size / 1024).toFixed(0)} KB</span>{preview && <audio controls src={preview} />}</div>}<p className="muted">Audio is validated before secure owner-scoped storage.</p></div>
+
+    <div className="card"><div className="eyebrow">02 · Interpret</div><h2>Analyze the signal</h2><p className="muted">PET AI provides a probabilistic interpretation, not a literal translation.</p><button className="primary" onClick={analyze} disabled={!file || !petId || busy}>{busy ? 'Analyzing…' : t.analyze}</button></div>
+
+    {result && <div className="result-card"><div className="eyebrow">03 · PET AI interpretation</div><div className="row-between"><div><span className="result-label">{t.mostLikely}</span><h2>{result.likely_intent}</h2></div><div className="confidence">{Math.round(result.confidence * 100)}%<small>{t.confidence}</small></div></div><p className="emotion">{result.emotional_state}</p><div className="result-grid"><div><strong>{t.signals}</strong><p>{result.signals.join(' · ') || 'Insufficient signal evidence'}</p></div><div><strong>{t.alternatives}</strong><p>{result.alternative_interpretations.join(' · ') || 'None'}</p></div><div><strong>{t.context}</strong><p>{result.context_used.join(' · ') || 'No context supplied'}</p></div></div>{result.safety_flag && <div className="safety"><strong>{t.safety}</strong><p>Persistent, unusual, or severe distress should be assessed by a qualified veterinarian.</p></div>}<p className="notice">AI-assisted interpretation only. Not literal pet-language translation and not a veterinary diagnosis. Model: {result.model_version}</p><div className="feedback"><span>Was this useful?</span><button onClick={() => sendFeedback('correct')}>{t.correct}</button><button onClick={() => sendFeedback('partly')}>{t.partly}</button><button onClick={() => sendFeedback('incorrect')}>{t.incorrect}</button></div>{feedback && <p className="muted">{feedback}</p>}</div>}
+  </div>
+}

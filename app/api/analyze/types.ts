@@ -1,0 +1,1 @@
+export type AnalysisResult={species:string;vocalization_type:string;signals:string[];likely_intent:string;emotional_state:string;confidence:number;alternative_interpretations:string[];context_used:string[];safety_flag:boolean;model_version:string;language:'en'|'hi'}
