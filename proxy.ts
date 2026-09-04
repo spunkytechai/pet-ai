@@ -3,15 +3,12 @@ import { NextResponse, type NextRequest } from 'next/server'
 
 export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request })
-
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
     {
       cookies: {
-        getAll() {
-          return request.cookies.getAll()
-        },
+        getAll() { return request.cookies.getAll() },
         setAll(cookiesToSet) {
           cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
           response = NextResponse.next({ request })
@@ -21,7 +18,24 @@ export async function proxy(request: NextRequest) {
     },
   )
 
-  await supabase.auth.getClaims()
+  const { data: { claims } } = await supabase.auth.getClaims()
+  const isProtected = request.nextUrl.pathname.startsWith('/analyze') || request.nextUrl.pathname.startsWith('/pet')
+  const isAuthPage = request.nextUrl.pathname === '/login' || request.nextUrl.pathname === '/signup'
+
+  if (isProtected && !claims) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/login'
+    url.searchParams.set('next', request.nextUrl.pathname)
+    return NextResponse.redirect(url)
+  }
+
+  if (isAuthPage && claims) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/analyze'
+    url.search = ''
+    return NextResponse.redirect(url)
+  }
+
   return response
 }
 
