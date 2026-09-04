@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { AudioRecorder } from './audio-recorder'
+import { normalizeAudioForAnalysis } from './audio-utils'
 
 type Pet = { id: string; name: string; species: 'dog' | 'cat'; age_years?: number | null }
 type Result = { id: string; pet_id: string; pet_name: string; recording_id: string; species: string; vocalization_type: string; signals: string[]; likely_intent: string; emotional_state: string; confidence: number; alternative_interpretations: string[]; context_used: string[]; safety_flag: boolean; model_version: string; language: 'en' | 'hi' }
@@ -39,13 +40,19 @@ export function AnalysisWorkbench() {
       .catch(() => setFeedback('Pets could not be loaded.'))
   }, [])
 
-  function acceptAudio(nextFile: File) {
+  async function acceptAudio(nextFile: File) {
     if (!nextFile.type.startsWith('audio/')) return setFeedback('Please choose an audio file.')
     if (nextFile.size > 4 * 1024 * 1024) return setFeedback('Audio must be 4 MB or smaller.')
-    setFile(nextFile)
-    setPreview(URL.createObjectURL(nextFile))
-    setResult(null)
     setFeedback('')
+    try {
+      const normalized = await normalizeAudioForAnalysis(nextFile)
+      if (normalized.size > 4 * 1024 * 1024) return setFeedback('Converted audio is larger than 4 MB. Please use a shorter clip.')
+      setFile(normalized)
+      setPreview(URL.createObjectURL(normalized))
+      setResult(null)
+    } catch (error) {
+      setFeedback(error instanceof Error ? error.message : 'Audio could not be prepared for analysis.')
+    }
   }
 
   async function analyze() {
@@ -75,7 +82,7 @@ export function AnalysisWorkbench() {
       <label>{t.contextLabel}<textarea value={context} onChange={(e) => setContext(e.target.value)} placeholder="e.g. I had just returned home and my dog was at the door." rows={3} /></label>
     </div>
 
-    <div className="card"><div className="eyebrow">01 · Capture</div><h2>Record or upload a pet signal</h2><div className="actions"><AudioRecorder onAudioReady={acceptAudio} disabled={busy || !petId} /><button className="secondary" type="button" onClick={() => inputRef.current?.click()} disabled={busy || !petId}>{t.upload}</button><input ref={inputRef} hidden type="file" accept="audio/*" onChange={(e) => e.target.files?.[0] && acceptAudio(e.target.files[0])} /></div>{file && <div className="audio-preview"><strong>{file.name}</strong><span>{(file.size / 1024).toFixed(0)} KB</span>{preview && <audio controls src={preview} />}</div>}<p className="muted">Audio is validated before secure owner-scoped storage.</p></div>
+    <div className="card"><div className="eyebrow">01 · Capture</div><h2>Record or upload a pet signal</h2><div className="actions"><AudioRecorder onAudioReady={acceptAudio} disabled={busy || !petId} /><button className="secondary" type="button" onClick={() => inputRef.current?.click()} disabled={busy || !petId}>{t.upload}</button><input ref={inputRef} hidden type="file" accept="audio/*" onChange={(e) => e.target.files?.[0] && void acceptAudio(e.target.files[0])} /></div>{file && <div className="audio-preview"><strong>{file.name}</strong><span>{(file.size / 1024).toFixed(0)} KB</span>{preview && <audio controls src={preview} />}</div>}<p className="muted">Audio is normalized to MP3/WAV-compatible analysis input before secure owner-scoped storage.</p></div>
 
     <div className="card"><div className="eyebrow">02 · Interpret</div><h2>Analyze the signal</h2><p className="muted">PET AI provides a probabilistic interpretation, not a literal translation.</p><button className="primary" onClick={analyze} disabled={!file || !petId || busy}>{busy ? 'Analyzing…' : t.analyze}</button></div>
 
