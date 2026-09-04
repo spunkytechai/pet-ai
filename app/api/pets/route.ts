@@ -3,6 +3,20 @@ import { createClient } from '@/lib/supabase/server'
 
 const species = new Set(['dog', 'cat'])
 
+export async function GET() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return NextResponse.json({ error: 'Authentication required.' }, { status: 401 })
+
+  const { data, error } = await supabase
+    .from('pets')
+    .select('id,name,species,age_years,created_at')
+    .order('created_at', { ascending: false })
+
+  if (error) return NextResponse.json({ error: 'Pets could not be loaded.' }, { status: 500 })
+  return NextResponse.json({ pets: data ?? [] })
+}
+
 export async function POST(request: Request) {
   const body = await request.json().catch(() => null)
   const name = typeof body?.name === 'string' ? body.name.trim().slice(0, 80) : ''
@@ -17,8 +31,12 @@ export async function POST(request: Request) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Authentication required.' }, { status: 401 })
 
-  const { data, error } = await supabase.from('pets').insert({ owner_id: user.id, name, species: petSpecies, age_years: age }).select('id,name,species,age_years').single()
-  if (error) return NextResponse.json({ error: 'Pet profile could not be created.' }, { status: 500 })
+  const { data, error } = await supabase
+    .from('pets')
+    .insert({ owner_id: user.id, name, species: petSpecies, age_years: age })
+    .select('id,name,species,age_years,created_at')
+    .single()
 
+  if (error) return NextResponse.json({ error: 'Pet profile could not be created.' }, { status: 500 })
   return NextResponse.json({ pet: data }, { status: 201 })
 }
