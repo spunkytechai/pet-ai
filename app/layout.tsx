@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import './product-ui.css'
 
 export const metadata: Metadata = {
   title: 'PET AI — Understand Your Pet',
