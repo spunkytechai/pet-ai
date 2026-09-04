@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { InterpretationSchema, abstain } from '@/lib/analysis'
+import { interpretPetAudio } from '@/lib/ai/pet-interpreter'
 
 const MAX_AUDIO_BYTES = 4 * 1024 * 1024
-const MODEL_VERSION = 'mvp-rule-engine-0.3'
+const FALLBACK_MODEL_VERSION = 'mvp-rule-engine-0.3'
 
 export async function POST(request: Request) {
   const form = await request.formData().catch(() => null)
@@ -55,7 +56,14 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Recording metadata could not be saved.' }, { status: 500 })
   }
 
-  const interpretation = InterpretationSchema.parse({
+  const aiInterpretation = await interpretPetAudio({
+    audio,
+    species: pet.species as 'dog' | 'cat',
+    context,
+    language: language as 'en' | 'hi',
+  }).catch(() => null)
+
+  const interpretation = aiInterpretation || InterpretationSchema.parse({
     species: pet.species,
     vocalization_type: 'vocalization',
     signals: ['short vocal event'],
@@ -65,7 +73,7 @@ export async function POST(request: Request) {
     alternative_interpretations: ['greeting', 'response to nearby stimulus'],
     context_used: [context || 'none'],
     safety_flag: false,
-    model_version: MODEL_VERSION,
+    model_version: FALLBACK_MODEL_VERSION,
     language,
   })
 
