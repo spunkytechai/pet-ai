@@ -96,5 +96,21 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Interpretation could not be saved.' }, { status: 500 })
   }
 
-  return NextResponse.json({ id: interpretationId, pet_id: pet.id, pet_name: pet.name, recording_id: recordingId, ...interpretation })
+  return NextResponse.json({
+    id: interpretationId,
+    pet_id: pet.id,
+    pet_name: pet.name,
+    recording_id: recordingId,
+    ...interpretation,
+    acoustic_features: features ? {
+      durationMs: features.durationMs,
+      rms: features.rms,
+      peak: features.peak,
+      zeroCrossingRate: features.zeroCrossingRate,
+      dynamicRange: features.dynamicRange,
+      estimatedArousal: features.estimatedArousal,
+      acousticQuality: features.acousticQuality,
+      voiced: features.voiced,
+    } : null,
+  })
 }
