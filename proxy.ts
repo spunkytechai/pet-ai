@@ -1,21 +1,32 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
+const PROTECTED_PREFIXES = ['/analyze', '/pet', '/history', '/api/analyze', '/api/history', '/api/feedback', '/api/pets']
+const AUTH_PAGES = new Set(['/login', '/signup'])
+
+function isProtectedPath(path: string) {
+  return PROTECTED_PREFIXES.some((prefix) => path === prefix || path.startsWith(`${prefix}/`))
+}
+
+function safeNextPath(value: string | null) {
+  if (!value || !value.startsWith('/') || value.startsWith('//') || value.includes('://')) return '/analyze'
+  return value
+}
+
 export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request })
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
   const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
   const path = request.nextUrl.pathname
-  const isProtected = path.startsWith('/analyze') || path.startsWith('/pet') || path.startsWith('/history') || path.startsWith('/api/analyze') || path.startsWith('/api/history') || path.startsWith('/api/feedback') || path.startsWith('/api/pets')
-  const isAuthPage = path === '/login' || path === '/signup'
+  const isProtected = isProtectedPath(path)
+  const isAuthPage = AUTH_PAGES.has(path)
 
-  // Keep public routes available if Supabase environment variables are not configured.
-  // Protected routes remain inaccessible until authentication is configured.
   if (!url || !key) {
     if (isProtected) {
       if (path.startsWith('/api/')) return NextResponse.json({ error: 'Authentication is not configured.' }, { status: 503 })
       const loginUrl = request.nextUrl.clone()
       loginUrl.pathname = '/login'
+      loginUrl.search = ''
       loginUrl.searchParams.set('next', path)
       return NextResponse.redirect(loginUrl)
     }
@@ -40,13 +51,15 @@ export async function proxy(request: NextRequest) {
     if (path.startsWith('/api/')) return NextResponse.json({ error: 'Authentication required.' }, { status: 401 })
     const loginUrl = request.nextUrl.clone()
     loginUrl.pathname = '/login'
+    loginUrl.search = ''
     loginUrl.searchParams.set('next', path)
     return NextResponse.redirect(loginUrl)
   }
 
   if (isAuthPage && claims) {
     const analyzeUrl = request.nextUrl.clone()
-    analyzeUrl.pathname = '/analyze'
+    const requestedNext = safeNextPath(request.nextUrl.searchParams.get('next'))
+    analyzeUrl.pathname = requestedNext
     analyzeUrl.search = ''
     return NextResponse.redirect(analyzeUrl)
   }
