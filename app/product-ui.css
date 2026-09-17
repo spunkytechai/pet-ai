@@ -265,3 +265,8 @@ textarea{resize:vertical}
  .analysis-capture-card:after,.analysis-context-card:after{display:none}
  .species-upload-card:after{font-size:48px}
 }
+
+
+.brand-lockup{position:relative}
+.brand-subtitle{display:none;font-size:8px;font-weight:650;letter-spacing:.02em;color:#9a968d;margin-left:2px}
+@media(min-width:801px){.brand-subtitle{display:block}}
