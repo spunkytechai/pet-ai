@@ -1,7 +1,7 @@
 import { InterpretationSchema, type Interpretation } from '@/lib/analysis'
 import type { AudioFeatures } from '@/lib/ai/audio-features'
 
-const MODEL_VERSION = 'mvp-rule-engine-0.4'
+const MODEL_VERSION = 'mvp-rule-engine-0.5'
 
 type Species = 'dog' | 'cat'
 type Language = 'en' | 'hi'
@@ -56,6 +56,9 @@ function acousticSignals(features: AudioFeatures | null) {
   if (features.rms >= 0.08) signals.push('higher acoustic energy')
   else if (features.rms > 0 && features.rms < 0.025) signals.push('low acoustic energy')
   if (features.zeroCrossingRate >= 0.12) signals.push('higher-frequency acoustic texture')
+  if (features.dynamicRange >= 1.8) signals.push('variable acoustic intensity')
+  if (features.estimatedArousal !== 'unknown') signals.push(`${features.estimatedArousal} estimated arousal`)
+  if (features.acousticQuality !== 'unknown') signals.push(`${features.acousticQuality} acoustic quality`)
   if (!features.voiced) signals.push('low-confidence voiced signal')
   return signals
 }
@@ -124,7 +127,9 @@ export function interpretDeterministically(input: {
   const second = candidates[1]?.rule
   const contextStrength = Math.min(1, 0.5 + matches * 0.14)
   const acousticSupport = audioSignals.length ? 0.05 : 0
-  const confidence = Math.min(0.78, Math.max(0.42, rule.weight * contextStrength + acousticSupport))
+  const arousalPenalty = input.features.estimatedArousal === 'unknown' ? 0 : 0.03
+  const qualityPenalty = input.features.acousticQuality === 'noisy' ? 0.08 : input.features.acousticQuality === 'weak' ? 0.12 : 0
+  const confidence = Math.min(0.78, Math.max(0.42, rule.weight * contextStrength + acousticSupport - arousalPenalty - qualityPenalty))
   const alternatives = second
     ? [second.intent, ...rule.alternatives].slice(0, 3)
     : rule.alternatives.slice(0, 3)
