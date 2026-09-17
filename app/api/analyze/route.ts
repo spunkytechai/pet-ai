@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { abstain } from '@/lib/analysis'
 import { interpretPetAudio } from '@/lib/ai/pet-interpreter'
 import { interpretDeterministically } from '@/lib/ai/deterministic-interpreter'
+import { extractWavFeatures } from '@/lib/ai/audio-features'
 
 const MAX_AUDIO_BYTES = 4 * 1024 * 1024
 
@@ -36,7 +37,7 @@ export async function POST(request: Request) {
   const interpretationId = crypto.randomUUID()
   const extension = audio.name.includes('.') ? audio.name.split('.').pop()?.toLowerCase() : 'webm'
   const safeExtension = extension && /^[a-z0-9]+$/.test(extension) ? extension : 'webm'
-  const storagePath = `${user.id}/${pet.id}/${recordingId}.${safeExtension}`
+  const storagePath = user.id + '/' + pet.id + '/' + recordingId + '.' + safeExtension
 
   const bytes = new Uint8Array(await audio.arrayBuffer())
   const { error: uploadError } = await supabase.storage.from('pet-recordings').upload(storagePath, bytes, {
@@ -63,12 +64,14 @@ export async function POST(request: Request) {
     language: language as 'en' | 'hi',
   }).catch(() => null)
 
+  const features = extractWavFeatures(bytes)
   const interpretation = aiInterpretation || interpretDeterministically({
     species: pet.species as 'dog' | 'cat',
     context,
     language: language as 'en' | 'hi',
     audioBytes: audio.size,
     audioMime: audio.type,
+    features,
   })
 
   const { error: interpretationError } = await supabase.from('interpretations').insert({
