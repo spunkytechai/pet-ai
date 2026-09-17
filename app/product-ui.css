@@ -189,3 +189,15 @@
 .pattern-bar i{display:block;height:100%;background:#171717;border-radius:99px}
 .history-safety{margin-top:14px;font-size:10px!important}
 @media(max-width:800px){.history-controls{margin-top:12px}.history-toolbar{display:block}.memory-grid{grid-template-columns:1fr}.memory-summary{padding:21px}.memory-grid article{padding:16px}}
+
+
+/* Global production polish */
+:focus-visible{outline:2px solid #171717;outline-offset:3px}
+button:disabled{cursor:not-allowed;opacity:.55}
+a,.primary,.secondary,button{transition:background .16s ease,color .16s ease,border-color .16s ease,transform .16s ease,opacity .16s ease}
+.primary:hover:not(:disabled),.secondary:hover:not(:disabled){transform:translateY(-1px)}
+input,select,textarea{font-family:inherit}
+textarea{resize:vertical}
+.app-page .container,.dashboard-page .container{width:min(1120px,calc(100% - 36px));margin:0 auto}
+.notice{line-height:1.55}
+@media(max-width:800px){.app-page .container,.dashboard-page .container{width:min(100% - 28px,1120px)}}
