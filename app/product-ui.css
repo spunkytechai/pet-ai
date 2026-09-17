@@ -121,3 +121,35 @@
  .pet-profile-stat{min-height:110px}
  .pet-signal-item{gap:11px}
 }
+
+
+/* Analyze 2.0 */
+.analysis-progress{grid-column:1/-1;display:flex;align-items:center;gap:9px;padding:3px 3px 2px;color:#9a968d;font-size:9px;text-transform:uppercase;letter-spacing:.08em}
+.analysis-progress span{display:flex;align-items:center;gap:6px;white-space:nowrap}
+.analysis-progress span.done{color:#171717}
+.analysis-progress span b{font-weight:800}
+.analysis-progress i{height:1px;flex:1;background:#d8d4ca;min-width:20px}
+.analysis-progress i.done{background:#171717}
+.analysis-context-card{border-left:3px solid #171717}
+.context-hints{display:flex;flex-wrap:wrap;gap:7px;margin-top:9px}
+.context-hints button{border:1px solid #ddd9cf;background:#f8f6f0;border-radius:999px;padding:7px 10px;font-size:9px;color:#68655e;cursor:pointer}
+.context-hints button:hover{background:#ebe8df;color:#171717}
+.capture-title-row{display:flex;justify-content:space-between;align-items:flex-start;gap:18px}
+.capture-title-row h2{margin-bottom:5px}
+.capture-title-row p{margin:0!important}
+.capture-limit{border:1px solid #ddd9d0;background:#f8f6f0;border-radius:999px;padding:7px 10px;white-space:nowrap;font-size:9px;text-transform:uppercase;letter-spacing:.07em;color:#858178}
+.analysis-capture-card .actions{margin-top:18px}
+.analysis-action-card{background:#eeeadf!important}
+.analysis-action-card .primary{width:100%;font-size:14px;padding:15px}
+.analysis-action-card .microcopy{margin-top:13px}
+.result-topline{display:flex;justify-content:space-between;align-items:center;gap:15px}
+.result-status{border:1px solid rgba(255,255,255,.18);border-radius:999px;padding:7px 10px;font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:#c7c4bc}
+@media(max-width:800px){
+ .analysis-progress{overflow:hidden;gap:6px}
+ .analysis-progress i{min-width:12px}
+ .analysis-progress span b{display:none}
+ .capture-title-row{display:block}
+ .capture-limit{display:inline-block;margin-top:12px}
+ .result-topline{align-items:flex-start}
+ .result-status{font-size:8px;padding:6px 8px}
+}
