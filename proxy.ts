@@ -1,7 +1,7 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
-const PROTECTED_PREFIXES = ['/analyze', '/pet', '/history', '/species', '/api/analyze', '/api/history', '/api/feedback', '/api/pets', '/api/species-identify']
+const PROTECTED_PREFIXES = ['/dashboard', '/analyze', '/pet', '/history', '/species', '/api/analyze', '/api/history', '/api/feedback', '/api/pets', '/api/species-identify']
 const AUTH_PAGES = new Set(['/login', '/signup'])
 
 function isProtectedPath(path: string) {
@@ -9,7 +9,7 @@ function isProtectedPath(path: string) {
 }
 
 function safeNextPath(value: string | null) {
-  if (!value || !value.startsWith('/') || value.startsWith('//') || value.includes('://')) return '/analyze'
+  if (!value || !value.startsWith('/') || value.startsWith('//') || value.includes('://') || value.includes('\\')) return '/dashboard'
   return value
 }
 
@@ -57,11 +57,11 @@ export async function proxy(request: NextRequest) {
   }
 
   if (isAuthPage && claims) {
-    const analyzeUrl = request.nextUrl.clone()
+    const nextUrl = request.nextUrl.clone()
     const requestedNext = safeNextPath(request.nextUrl.searchParams.get('next'))
-    analyzeUrl.pathname = requestedNext
-    analyzeUrl.search = ''
-    return NextResponse.redirect(analyzeUrl)
+    nextUrl.pathname = requestedNext
+    nextUrl.search = ''
+    return NextResponse.redirect(nextUrl)
   }
 
   return response
