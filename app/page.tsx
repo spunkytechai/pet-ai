@@ -53,6 +53,20 @@ export default function Home() {
           </div>
         </section>
 
+
+        <section className="capabilities-section" aria-labelledby="capabilities-title">
+          <div className="section-heading"><div><div className="eyebrow">More than voice analysis</div><h2 id="capabilities-title">One place to know your pet better.</h2></div><p>Explore sounds, identify your pet, and build a private history around the moments that matter.</p></div>
+          <div className="capability-grid">
+            <article className="capability-card capability-dark"><span className="capability-number">01</span><div><h3>Understand a sound</h3><p>Record or upload a cat or dog vocalization. PET AI combines acoustic evidence with your context to produce cautious hypotheses.</p><Link href="/analyze">Analyze a sound <span>→</span></Link></div></article>
+            <article className="capability-card"><span className="capability-number">02</span><div><h3>Know your pet</h3><p>Take a photo or upload one for a visual estimate, then open an A–Z species card with traits, care guidance, behavior, and things to watch for.</p><Link href="/species">Open Species Analyzer <span>→</span></Link></div></article>
+            <article className="capability-card"><span className="capability-number">03</span><div><h3>Learn over time</h3><p>Keep interpretations, owner feedback, and recurring observations connected to each pet in a private history.</p><Link href="/history">View pet memory <span>→</span></Link></div></article>
+          </div>
+        </section>
+
+        <section className="try-section" aria-labelledby="try-title">
+          <div className="try-card"><div><div className="eyebrow">Try it without recording</div><h2 id="try-title">Start with a real cat or dog sample.</h2><p>Use PET AI's curated demo sounds to experience the analysis flow before recording your own pet.</p></div><div className="try-actions"><Link className="secondary" href="/analyze">Try a sample <span>→</span></Link><Link className="primary" href="/signup">Create my pet <span>→</span></Link></div></div>
+        </section>
+
         <section className="how-section">
           <div className="section-heading"><div><div className="eyebrow">A simpler way to understand them</div><h2>From sound to a useful hypothesis.</h2></div><p>PET AI keeps the experience simple while keeping the science honest.</p></div>
           <div className="product-steps">
