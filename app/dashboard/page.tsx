@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 import { AppNav } from '@/components/app-nav'
+import { PetVisual } from '@/components/pet-visual'
 
 type Pet = { id: string; name: string; species: 'dog' | 'cat'; age_years?: number | null }
 type HistoryItem = {
@@ -76,7 +77,7 @@ export default function DashboardPage() {
             <div className="pet-grid">
               {pets.map((pet) => (
                 <article className="pet-tile" key={pet.id}>
-                  <div className={`pet-tile-avatar ${pet.species}`} aria-hidden="true">{pet.species === 'dog' ? '●' : '◐'}</div>
+                  <PetVisual species={pet.species} size="sm" label={`${pet.name}, ${pet.species}`} />
                   <div className="pet-tile-copy">
                     <span className="eyebrow">{pet.species}</span>
                     <h3>{pet.name}</h3>
