@@ -24,14 +24,14 @@ export default function Home() {
               <Link className="primary hero-cta" href="/signup">Start with my pet <span>→</span></Link>
               <Link className="secondary hero-secondary" href="/login">I already have an account</Link>
             </div>
-            <div className="trust-row">
+            <div className="hero-proof"><span><strong>2</strong> species</span><span><strong>2</strong> languages</span><span><strong>Private</strong> history</span></div><div className="trust-row">
               <span>Dog + cat</span><i />
               <span>English + Hindi</span><i />
               <span>Built around uncertainty</span>
             </div>
           </div>
 
-          <div className="pet-product-card" aria-label="Example PET AI interpretation">
+          <div className="hero-visual-wrap"><div className="hero-orbit hero-orbit-one"/><div className="hero-orbit hero-orbit-two"/><div className="hero-spark spark-one">+</div><div className="hero-spark spark-two">•</div><div className="pet-product-card" aria-label="Example PET AI interpretation">
             <div className="product-glow" />
             <div className="pet-card-top">
               <div>
@@ -50,7 +50,7 @@ export default function Home() {
               <div className="listening-copy"><span className="tiny-label">LAST SIGNAL</span><strong>Bruno may be asking for attention</strong><small>Confidence 78% · 14:32</small></div>
             </div>
             <div className="product-actions"><span className="mini-chip">Attention seeking</span><span className="mini-chip">Engaged</span><Link href="/signup" className="round-arrow">→</Link></div>
-          </div>
+          </div></div>
         </section>
 
 
