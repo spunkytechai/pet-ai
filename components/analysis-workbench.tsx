@@ -5,11 +5,12 @@ import { AudioRecorder } from './audio-recorder'
 import { normalizeAudioForAnalysis } from './audio-utils'
 
 type Pet = { id: string; name: string; species: 'dog' | 'cat'; age_years?: number | null }
+type DemoSample = { id: string; species: 'dog' | 'cat'; title: string; description: string; sourceUrl: string; license: string; attribution: string }
 type Result = { id: string; pet_id: string; pet_name: string; recording_id: string; species: string; vocalization_type: string; signals: string[]; likely_intent: string; emotional_state: string; confidence: number; alternative_interpretations: string[]; context_used: string[]; safety_flag: boolean; model_version: string; language: 'en' | 'hi' }
 
 const copy = {
-  en: { mostLikely: 'Most likely', confidence: 'Confidence', signals: 'Signals detected', alternatives: 'Other possibilities', context: 'Context considered', safety: 'Safety note', correct: 'Correct', partly: 'Partly correct', incorrect: 'Not correct', analyze: 'Analyze sound', upload: 'Upload audio', contextLabel: 'What was happening when your pet made this sound?', pet: 'Pet', choosePet: 'Choose a pet', createPet: 'Create a pet profile', emptyPets: 'Create a pet profile first.', signIn: 'Sign in required' },
-  hi: { mostLikely: 'सबसे संभावित अर्थ', confidence: 'विश्वास स्तर', signals: 'पहचाने गए संकेत', alternatives: 'अन्य संभावनाएँ', context: 'विचार किया गया संदर्भ', safety: 'सुरक्षा सूचना', correct: 'सही', partly: 'आंशिक रूप से सही', incorrect: 'सही नहीं', analyze: 'आवाज़ का विश्लेषण करें', upload: 'ऑडियो अपलोड करें', contextLabel: 'जब आपके पालतू ने यह आवाज़ निकाली तब क्या हो रहा था?', pet: 'पालतू', choosePet: 'पालतू चुनें', createPet: 'पालतू प्रोफ़ाइल बनाएं', emptyPets: 'पहले पालतू प्रोफ़ाइल बनाएं।', signIn: 'साइन इन आवश्यक' },
+  en: { mostLikely: 'Most likely', confidence: 'Confidence', signals: 'Signals detected', alternatives: 'Other possibilities', context: 'Context considered', safety: 'Safety note', correct: 'Correct', partly: 'Partly correct', incorrect: 'Not correct', analyze: 'Analyze sound', upload: 'Upload audio', contextLabel: 'What was happening when your pet made this sound?', pet: 'Pet', choosePet: 'Choose a pet', createPet: 'Create a pet profile', emptyPets: 'Create a pet profile first.', signIn: 'Sign in required', samples: 'Try a sample', sampleIntro: 'Explore a short public recording before using your own pet audio.', play: 'Play', useSample: 'Use for analysis', loading: 'Loading…' },
+  hi: { mostLikely: 'सबसे संभावित अर्थ', confidence: 'विश्वास स्तर', signals: 'पहचाने गए संकेत', alternatives: 'अन्य संभावनाएँ', context: 'विचार किया गया संदर्भ', safety: 'सुरक्षा सूचना', correct: 'सही', partly: 'आंशिक रूप से सही', incorrect: 'सही नहीं', analyze: 'आवाज़ का विश्लेषण करें', upload: 'ऑडियो अपलोड करें', contextLabel: 'जब आपके पालतू ने यह आवाज़ निकाली तब क्या हो रहा था?', pet: 'पालतू', choosePet: 'पालतू चुनें', createPet: 'पालतू प्रोफ़ाइल बनाएं', emptyPets: 'पहले पालतू प्रोफ़ाइल बनाएं।', signIn: 'साइन इन आवश्यक', samples: 'एक नमूना आज़माएँ', sampleIntro: 'अपने पालतू की आवाज़ इस्तेमाल करने से पहले एक छोटा सार्वजनिक रिकॉर्डिंग नमूना सुनें।', play: 'चलाएँ', useSample: 'विश्लेषण के लिए उपयोग करें', loading: 'लोड हो रहा है…' },
 }
 
 export function AnalysisWorkbench() {
@@ -22,23 +23,28 @@ export function AnalysisWorkbench() {
   const [busy, setBusy] = useState(false)
   const [language, setLanguage] = useState<'en' | 'hi'>('en')
   const [feedback, setFeedback] = useState('')
+  const [samples, setSamples] = useState<DemoSample[]>([])
+  const [sampleBusy, setSampleBusy] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
   const t = copy[language]
   const pet = pets.find((item) => item.id === petId)
 
   useEffect(() => {
-    fetch('/api/pets')
-      .then((r) => r.json())
-      .then((data) => {
-        if (Array.isArray(data.pets)) {
-          setPets(data.pets)
-          const params = new URLSearchParams(window.location.search)
-          const requested = params.get('pet')
-          setPetId(data.pets.some((p: Pet) => p.id === requested) ? requested! : data.pets[0]?.id ?? '')
-        }
-      })
-      .catch(() => setFeedback('Pets could not be loaded.'))
+    fetch('/api/pets').then((r) => r.json()).then((data) => {
+      if (Array.isArray(data.pets)) {
+        setPets(data.pets)
+        const params = new URLSearchParams(window.location.search)
+        const requested = params.get('pet')
+        setPetId(data.pets.some((p: Pet) => p.id === requested) ? requested! : data.pets[0]?.id ?? '')
+      }
+    }).catch(() => setFeedback('Pets could not be loaded.'))
+
+    fetch('/api/demo-audio').then((r) => r.json()).then((data) => {
+      if (Array.isArray(data.samples)) setSamples(data.samples)
+    }).catch(() => setSamples([]))
   }, [])
+
+  useEffect(() => () => { if (preview) URL.revokeObjectURL(preview) }, [preview])
 
   async function acceptAudio(nextFile: File) {
     if (!nextFile.type.startsWith('audio/')) return setFeedback('Please choose an audio file.')
@@ -50,9 +56,19 @@ export function AnalysisWorkbench() {
       setFile(normalized)
       setPreview(URL.createObjectURL(normalized))
       setResult(null)
-    } catch (error) {
-      setFeedback(error instanceof Error ? error.message : 'Audio could not be prepared for analysis.')
-    }
+    } catch (error) { setFeedback(error instanceof Error ? error.message : 'Audio could not be prepared for analysis.') }
+  }
+
+  async function useSample(sample: DemoSample) {
+    if (!petId) return setFeedback('Create a pet profile before analyzing a sample.')
+    setSampleBusy(sample.id); setFeedback('')
+    try {
+      const response = await fetch(`/api/demo-audio/${encodeURIComponent(sample.id)}`)
+      if (!response.ok) throw new Error('This demo sample is temporarily unavailable.')
+      const blob = await response.blob()
+      await acceptAudio(new File([blob], `${sample.id}.wav`, { type: blob.type || 'audio/wav' }))
+    } catch (error) { setFeedback(error instanceof Error ? error.message : 'Sample could not be loaded.') }
+    finally { setSampleBusy('') }
   }
 
   async function analyze() {
@@ -81,6 +97,8 @@ export function AnalysisWorkbench() {
       {pets.length ? <label>{t.pet}<select value={petId} onChange={(e) => { setPetId(e.target.value); setResult(null) }}>{pets.map((item) => <option key={item.id} value={item.id}>{item.name} · {item.species}</option>)}</select></label> : <p className="muted">{t.emptyPets} <a href="/pet/new">{t.createPet}</a></p>}
       <label>{t.contextLabel}<textarea value={context} onChange={(e) => setContext(e.target.value)} placeholder="e.g. I had just returned home and my dog was at the door." rows={3} /></label>
     </div>
+
+    {samples.length > 0 && <div className="card sample-card"><div className="eyebrow">00 · Explore</div><div className="row-between sample-heading"><div><h2>{t.samples}</h2><p className="muted">{t.sampleIntro}</p></div><span className="sample-count">{samples.length} public samples</span></div><div className="sample-grid">{samples.map((sample) => <article className="sample-item" key={sample.id}><div className="sample-icon" aria-hidden="true">{sample.species === 'cat' ? '◐' : '◒'}</div><div className="sample-copy"><div className="sample-topline"><strong>{sample.title}</strong><span>{sample.species}</span></div><p>{sample.description}</p><audio controls preload="none" src={`/api/demo-audio/${encodeURIComponent(sample.id)}`} /><div className="sample-actions"><button className="secondary" type="button" onClick={() => void useSample(sample)} disabled={busy || sampleBusy !== '' || !petId}>{sampleBusy === sample.id ? t.loading : t.useSample}</button><a href={sample.sourceUrl} target="_blank" rel="noreferrer">Source · {sample.license}</a></div></div></article>)}</div></div>}
 
     <div className="card"><div className="eyebrow">01 · Capture</div><h2>Record or upload a pet signal</h2><div className="actions"><AudioRecorder onAudioReady={acceptAudio} disabled={busy || !petId} /><button className="secondary" type="button" onClick={() => inputRef.current?.click()} disabled={busy || !petId}>{t.upload}</button><input ref={inputRef} hidden type="file" accept="audio/*" onChange={(e) => e.target.files?.[0] && void acceptAudio(e.target.files[0])} /></div>{file && <div className="audio-preview"><strong>{file.name}</strong><span>{(file.size / 1024).toFixed(0)} KB</span>{preview && <audio controls src={preview} />}</div>}<p className="muted">Audio is normalized to MP3/WAV-compatible analysis input before secure owner-scoped storage.</p></div>
 
