@@ -3,6 +3,11 @@
 import { FormEvent, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 
+function safeNextPath(value: string | null) {
+  if (!value || !value.startsWith('/') || value.startsWith('//') || value.includes('://') || value.includes('\\')) return '/analyze'
+  return value
+}
+
 export default function SignupPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -16,12 +21,20 @@ export default function SignupPage() {
     setError('')
     setMessage('')
     const supabase = createClient()
-    const { data, error } = await supabase.auth.signUp({ email, password })
+    const next = safeNextPath(new URLSearchParams(window.location.search).get('next'))
+    const origin = window.location.origin
+    const emailRedirectTo = `${origin}/auth/confirm?next=${encodeURIComponent(next)}`
+    const { data, error } = await supabase.auth.signUp({ email, password, options: { emailRedirectTo } })
     if (error) setError(error.message)
-    else if (data.session) window.location.href = '/analyze'
+    else if (data.session) window.location.replace(next)
     else setMessage('Account created. Check your email to confirm your account, then sign in.')
     setBusy(false)
   }
 
-  return <main><div className="container"><section className="card auth-card"><div className="eyebrow">PET AI</div><h1>Create your account</h1><p className="muted">Your pet profiles, recordings, interpretations, and feedback are designed to stay owner-scoped.</p><form onSubmit={submit}><label>Email<input type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} /></label><label>Password<input type="password" autoComplete="new-password" minLength={8} required value={password} onChange={(e) => setPassword(e.target.value)} /></label>{error && <p className="safety">{error}</p>}{message && <p className="notice">{message}</p>}<button className="primary" disabled={busy}>{busy ? 'Creating…' : 'Create account'}</button></form><p className="muted">Already have an account? <a href="/login">Sign in</a></p></section></div></main>
+  return <main><div className="container"><section className="card auth-card"><div className="eyebrow">PET AI</div><h1>Create your account</h1><p className="muted">Your pet profiles, recordings, interpretations, and feedback are designed to stay owner-scoped.</p><form onSubmit={submit}><label>Email<input type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} /></label><label>Password<input type="password" autoComplete="new-password" minLength={8} required value={password} onChange={(e) => setPassword(e.target.value)} /></label>{error && <p className="safety">{error}</p>}{message && <p className="notice">{message}</p>}<button className="primary" disabled={busy}>{busy ? 'Creating…' : 'Create account'}</button></form><p className="muted">Already have an account? <a href={`/login?next=${encodeURIComponent(nextFromUrl())}`}>Sign in</a></p></section></div></main>
+}
+
+function nextFromUrl() {
+  if (typeof window === 'undefined') return '/analyze'
+  return safeNextPath(new URLSearchParams(window.location.search).get('next'))
 }
