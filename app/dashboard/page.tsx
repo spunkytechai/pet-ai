@@ -82,7 +82,7 @@ export default function DashboardPage() {
                     <h3>{pet.name}</h3>
                     <p>{pet.age_years == null ? 'Age not added' : `${pet.age_years} years old`}</p>
                   </div>
-                  <Link href={`/analyze?pet=${encodeURIComponent(pet.id)}`} aria-label={`Analyze a sound for ${pet.name}`}>→</Link>
+                  <Link href={`/pet/${encodeURIComponent(pet.id)}`} aria-label={`Open ${pet.name} profile`}>→</Link>
                 </article>
               ))}
             </div>
