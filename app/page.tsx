@@ -9,7 +9,7 @@ export default function Home() {
             <span className="brand-mark" aria-hidden="true">◒</span>
             <span>PET AI</span>
           </Link>
-          <nav className="nav-links">
+          <nav className="nav-links"><Link href="/species">Species Analyzer</Link>
             <Link href="/login">Sign in</Link>
             <Link className="secondary small" href="/signup">Create account</Link>
           </nav>
