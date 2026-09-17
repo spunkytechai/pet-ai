@@ -8,7 +8,7 @@ export default function AnalyzePage() {
         <header className="nav app-nav">
           <Link href="/" className="brand brand-lockup"><span className="brand-mark" aria-hidden="true">◒</span><span>PET AI</span></Link>
           <nav className="nav-links app-nav-links">
-            <Link href="/history">History</Link>
+            <Link href="/species">Species</Link><Link href="/history">History</Link>
             <Link className="badge" href="/pet/new">+ Add pet</Link>
           </nav>
         </header>
