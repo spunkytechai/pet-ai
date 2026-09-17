@@ -138,7 +138,7 @@ export function SpeciesAnalyzer() {
 
         <div className="species-section-grid">
           {sections.map(([title, key]) => {
-            const items = Array.isArray(activeProfile[key]) ? profile[key] as string[] : []
+            const items = Array.isArray(activeProfile[key]) ? activeProfile[key] as string[] : []
             return <article key={key}><h3>{title}</h3><ul>{items.map((item, index) => <li key={index}>{item}</li>)}</ul></article>
           })}
         </div>
