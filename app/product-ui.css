@@ -174,3 +174,18 @@
  .feedback{align-items:flex-start!important;flex-wrap:wrap}
  .feedback>div:first-child{width:100%;margin-bottom:3px}
 }
+
+
+/* Pet Memory 2.0 */
+.history-controls{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.history-controls select,.history-controls button{border:1px solid #ddd9d0;background:#fff;border-radius:999px;padding:7px 10px;font-size:9px;color:#77746c}
+.history-controls button{cursor:pointer}
+.history-controls button.active{background:#171717;color:#fff;border-color:#171717}
+.memory-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:20px}
+.memory-grid article{background:#f8f6f0;border:1px solid #e3dfd6;border-radius:18px;padding:18px}
+.memory-grid article strong{display:block;font-size:17px;letter-spacing:-.025em;margin:10px 0 6px}
+.memory-grid article>span{display:block;font-size:10px;color:#88847b;line-height:1.5}
+.pattern-bar{height:4px;border-radius:99px;background:#e2ded5;margin-top:15px;overflow:hidden}
+.pattern-bar i{display:block;height:100%;background:#171717;border-radius:99px}
+.history-safety{margin-top:14px;font-size:10px!important}
+@media(max-width:800px){.history-controls{margin-top:12px}.history-toolbar{display:block}.memory-grid{grid-template-columns:1fr}.memory-summary{padding:21px}.memory-grid article{padding:16px}}
