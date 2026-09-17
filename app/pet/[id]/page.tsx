@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 import { AppNav } from '@/components/app-nav'
+import { PetVisual } from '@/components/pet-visual'
 
 type Pet = { id:string; name:string; species:'dog'|'cat'; age_years?:number|null; created_at:string }
 type Signal = { id:string; pet?:{id:string;name:string;species:string}|null; likely_intent:string; emotional_state:string; confidence:number; safety_flag:boolean; created_at:string }
@@ -39,7 +40,7 @@ export default function PetProfilePage({ params }: { params: Promise<{ id: strin
       <div className="container">
         <AppNav />
         <section className="pet-profile-hero">
-          <div className={`pet-profile-art ${pet.species}`} aria-hidden="true">{pet.species === 'dog' ? '◒' : '◐'}</div>
+          <PetVisual species={pet.species} size="lg" label={`${pet.name}, ${pet.species}`} />
           <div className="pet-profile-copy">
             <div className="eyebrow">Pet profile · {pet.species}</div>
             <h1>{pet.name}</h1>
