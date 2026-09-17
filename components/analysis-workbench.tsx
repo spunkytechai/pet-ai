@@ -88,7 +88,10 @@ export function AnalysisWorkbench() {
   async function sendFeedback(value: string) {
     if (!result) return
     const response = await fetch('/api/feedback', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ rating: value, interpretation_id: result.id }) })
-    setFeedback(response.ok ? `Feedback saved: ${value}.` : 'Feedback could not be saved. Please try again.')
+    const data = await response.json().catch(() => null)
+    if (!response.ok) return setFeedback(data?.error || 'Feedback could not be saved. Please try again.')
+    const memory = data?.memory_updated ? ' Your pet memory was updated.' : ''
+    setFeedback(`Feedback saved: ${value}.${memory}`)
   }
 
   return <div className="workbench">
