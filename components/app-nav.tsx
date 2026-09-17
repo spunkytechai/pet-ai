@@ -18,7 +18,7 @@ export function AppNav() {
     <header className="nav app-nav">
       <Link href="/dashboard" className="brand brand-lockup" aria-label="PET AI home">
         <span className="brand-mark" aria-hidden="true">◒</span>
-        <span>PET AI</span>
+        <span>PET AI</span><small className="brand-subtitle">Understand better.</small>
       </Link>
       <div className="app-nav-main">
         <nav className="app-nav-links" aria-label="Primary">
