@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { LogoutButton } from '@/components/logout-button'
+import { AppNav } from '@/components/app-nav'
 
 export default function HistoryPage() {
   const [history, setHistory] = useState<any[]>([])
@@ -28,7 +28,7 @@ export default function HistoryPage() {
   return (
     <main className="app-page">
       <div className="container">
-        <header className="nav app-nav"><Link href="/" className="brand brand-lockup"><span className="brand-mark" aria-hidden="true">◒</span><span>PET AI</span></Link><nav className="nav-links"><Link className="secondary small" href="/analyze">Analyze a sound</Link><Link className="secondary small" href="/pet/new">+ Add pet</Link><LogoutButton /></nav></header>
+        <AppNav />
         <section className="hero history-hero"><div className="eyebrow">Your pet memory</div><h1>A record of what you've learned together.</h1><p>Every interpretation, context clue, and correction helps you see recurring patterns without pretending a guess is a fact.</p></section>
         <div className="history-toolbar"><div><strong>{history.length}</strong><span> interpretations</span></div><span className="history-private">Private to your account</span></div>
         {loading && <div className="card"><p className="muted">Loading your pet memory…</p></div>}
