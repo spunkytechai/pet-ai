@@ -90,3 +90,34 @@
   .dashboard-empty.compact .secondary{margin-top:15px}
   .recent-item{grid-template-columns:10px 1fr auto;gap:12px}
 }
+
+
+/* Pet profile 360 */
+.pet-profile-hero{display:grid;grid-template-columns:230px 1fr;gap:42px;align-items:center;padding:58px 0 42px}
+.pet-profile-art{width:230px;height:230px;border-radius:52px;background:linear-gradient(145deg,#d9c2a8,#9a704d);display:grid;place-items:center;font-size:105px;color:#fff;box-shadow:inset 0 -25px 55px rgba(40,28,18,.12)}
+.pet-profile-art.cat{background:linear-gradient(145deg,#d9d0df,#85758e)}
+.pet-profile-copy h1{font-size:clamp(50px,7vw,88px);line-height:.9;letter-spacing:-.07em;margin:8px 0 13px}
+.pet-profile-copy>p{color:#77746d;font-size:13px;margin:0}
+.pet-profile-actions{display:flex;gap:9px;margin-top:22px;flex-wrap:wrap}
+.pet-profile-actions a{white-space:nowrap}
+.pet-profile-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding-bottom:60px}
+.pet-profile-stat{background:#fff;border:1px solid #dfdcd3;border-radius:20px;padding:20px;min-height:130px}
+.pet-profile-stat span,.pet-profile-stat small{display:block;font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:#8a877e;font-weight:750}
+.pet-profile-stat strong{display:block;font-size:25px;letter-spacing:-.04em;margin:10px 0 6px;line-height:1.1}
+.pet-profile-stat small{text-transform:none;letter-spacing:0;font-size:10px;color:#9b978e;font-weight:600}
+.pet-profile-section{padding-bottom:55px}
+.pet-signal-list{border-top:1px solid #ddd9d0}
+.pet-signal-item{display:grid;grid-template-columns:10px 1fr auto;gap:15px;align-items:center;padding:16px 2px;border-bottom:1px solid #ddd9d0}
+.pet-signal-item>div:nth-child(2)>span{display:block;font-size:9px;color:#99958c}
+.pet-signal-item strong{display:block;font-size:14px;margin-top:4px}
+.pet-signal-item p{font-size:11px;color:#77736b;margin:3px 0 0}
+.pet-signal-item>b{font-size:13px}
+.pet-profile-loading{margin-top:50px;text-align:center;padding:60px}
+@media(max-width:800px){
+ .pet-profile-hero{grid-template-columns:1fr;gap:24px;padding:40px 0 30px}
+ .pet-profile-art{width:150px;height:150px;border-radius:38px;font-size:68px}
+ .pet-profile-copy h1{font-size:58px}
+ .pet-profile-grid{grid-template-columns:1fr;padding-bottom:42px}
+ .pet-profile-stat{min-height:110px}
+ .pet-signal-item{gap:11px}
+}
