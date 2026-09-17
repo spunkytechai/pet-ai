@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { InterpretationSchema, abstain } from '@/lib/analysis'
+import { abstain } from '@/lib/analysis'
 import { interpretPetAudio } from '@/lib/ai/pet-interpreter'
+import { interpretDeterministically } from '@/lib/ai/deterministic-interpreter'
 
 const MAX_AUDIO_BYTES = 4 * 1024 * 1024
-const FALLBACK_MODEL_VERSION = 'mvp-rule-engine-0.3'
 
 export async function POST(request: Request) {
   const form = await request.formData().catch(() => null)
@@ -63,18 +63,12 @@ export async function POST(request: Request) {
     language: language as 'en' | 'hi',
   }).catch(() => null)
 
-  const interpretation = aiInterpretation || InterpretationSchema.parse({
-    species: pet.species,
-    vocalization_type: 'vocalization',
-    signals: ['short vocal event'],
-    likely_intent: 'ATTENTION_SEEKING',
-    emotional_state: 'neutral-to-engaged',
-    confidence: 0.56,
-    alternative_interpretations: ['greeting', 'response to nearby stimulus'],
-    context_used: [context || 'none'],
-    safety_flag: false,
-    model_version: FALLBACK_MODEL_VERSION,
-    language,
+  const interpretation = aiInterpretation || interpretDeterministically({
+    species: pet.species as 'dog' | 'cat',
+    context,
+    language: language as 'en' | 'hi',
+    audioBytes: audio.size,
+    audioMime: audio.type,
   })
 
   const { error: interpretationError } = await supabase.from('interpretations').insert({
