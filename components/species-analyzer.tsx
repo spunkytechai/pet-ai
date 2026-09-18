@@ -99,13 +99,13 @@ export function SpeciesAnalyzer() {
       <section className="card species-upload-card">
         <div className="eyebrow">01 · Identify</div>
         <h2>Show us your pet</h2>
-        <p className="muted">Click a photo or upload one. PET AI will estimate the species and, when evidence allows, the likely breed/type.</p>
+        <p className="muted">Upload a photo for the current visual-analysis workflow. If photo identification is unavailable, choose Dog or Cat for a general A–Z guide.</p>
         <input ref={inputRef} hidden type="file" accept="image/*" capture="environment" onChange={(e) => e.target.files?.[0] && selectImage(e.target.files[0])} />
         <button className="primary" onClick={() => inputRef.current?.click()}>{file ? 'Change photo' : 'Click a photo / upload'}</button>
         {preview && <div className="species-preview"><img src={preview} alt="Selected pet" /></div>}
         {file && <div className="species-file"><strong>{file.name}</strong><span>{Math.ceil(file.size / 1024)} KB</span></div>}
-        <button className="secondary species-identify" disabled={!file || busy} onClick={identify}>{busy ? 'Analyzing photo…' : 'Identify this pet →'}</button>
-        <p className="microcopy">Identification is probabilistic. A photo cannot establish health, pedigree, exact age, or sex.</p>
+        <button className="secondary species-identify" disabled={!file || busy} onClick={identify}>{busy ? 'Analyzing photo…' : 'Analyze this photo →'}</button>
+        <p className="microcopy">Photo identification is only available when a compatible local vision model is installed. A photo cannot establish health, pedigree, exact age, or sex.</p>
       </section>
 
       {result?.error && <div className="card safety"><strong>Species analysis unavailable</strong><p>{result.error}</p></div>}
