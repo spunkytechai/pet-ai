@@ -19,6 +19,9 @@ export async function POST(request: Request) {
   const { data: recording } = await supabase.from('recordings').select('pet_id').eq('id', interpretation.recording_id).single()
   if (!recording) return NextResponse.json({ error: 'Recording not found.' }, { status: 404 })
 
+  const { data: ownedPet } = await supabase.from('pets').select('id').eq('id', recording.pet_id).eq('owner_id', user.id).single()
+  if (!ownedPet) return NextResponse.json({ error: 'You do not have access to this interpretation.' }, { status: 403 })
+
   const { data: feedback, error } = await supabase.from('feedback').insert({
     interpretation_id: interpretation.id,
     label: body.rating,
@@ -37,10 +40,10 @@ export async function POST(request: Request) {
   if (body.rating === 'correct' || body.rating === 'partly') {
     const { data: existing } = await supabase.from('pet_patterns').select('id,evidence_count,validated').eq('pet_id', recording.pet_id).eq('pattern', interpretation.likely_intent).maybeSingle()
     if (existing) {
-      const { error: memoryError } = await supabase.from('pet_patterns').update({ evidence_count: existing.evidence_count + 1, validated: existing.validated || body.rating === 'correct', updated_at: new Date().toISOString() }).eq('id', existing.id)
+      const { error: memoryError } = await supabase.from('pet_patterns').update({ evidence_count: existing.evidence_count + 1, validated: false, updated_at: new Date().toISOString() }).eq('id', existing.id)
       memoryUpdated = !memoryError
     } else {
-      const { error: memoryError } = await supabase.from('pet_patterns').insert({ pet_id: recording.pet_id, pattern: interpretation.likely_intent, evidence_count: 1, validated: body.rating === 'correct', updated_at: new Date().toISOString() })
+      const { error: memoryError } = await supabase.from('pet_patterns').insert({ pet_id: recording.pet_id, pattern: interpretation.likely_intent, evidence_count: 1, validated: false, updated_at: new Date().toISOString() })
       memoryUpdated = !memoryError
     }
   }
