@@ -55,7 +55,7 @@ export default function PetProfilePage({ params }: { params: Promise<{ id: strin
         <section className="pet-profile-grid">
           <article className="pet-profile-stat"><span>Signals recorded</span><strong>{signals.length}</strong><small>interpretations linked to {pet.name}</small></article>
           <article className="pet-profile-stat"><span>Recurring observation</span><strong>{pattern?.[0] ?? 'Not enough data'}</strong><small>{pattern ? `${pattern[1]} recorded observation${pattern[1] === 1 ? '' : 's'}` : 'Keep analyzing moments to build a pattern.'}</small></article>
-          <article className="pet-profile-stat"><span>Latest confidence</span><strong>{signals[0] ? `${Math.round(Number(signals[0].confidence)*100)}%` : '—'}</strong><small>{signals[0] ? 'for the latest interpretation' : 'No interpretation yet'}</small></article>
+          <article className="pet-profile-stat"><span>Latest heuristic confidence</span><strong>{signals[0] ? `${Math.round(Number(signals[0].confidence)*100)}%` : '—'}</strong><small>{signals[0] ? 'heuristic score for the latest interpretation' : 'No interpretation yet'}</small></article>
         </section>
 
         <section className="pet-profile-section">
