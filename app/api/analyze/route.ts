@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { abstain } from '@/lib/analysis'
 import { interpretDeterministically } from '@/lib/ai/deterministic-interpreter'
+import { getLocalAudioModel } from '@/lib/ai/local-model'
 import { extractWavFeatures } from '@/lib/ai/audio-features'
 
 const MAX_AUDIO_BYTES = 4 * 1024 * 1024
@@ -45,7 +46,9 @@ export async function POST(request: Request) {
   }
 
   const features = extractWavFeatures(bytes)
-  const interpretation = interpretDeterministically({
+  const localModel = getLocalAudioModel()
+  const modelInterpretation = localModel ? await localModel.analyze({ species: pet.species as 'dog' | 'cat', context, language: language as 'en' | 'hi', audio: bytes, features }).catch(() => null) : null
+  const interpretation = modelInterpretation || interpretDeterministically({
     species: pet.species as 'dog' | 'cat',
     context,
     language: language as 'en' | 'hi',
