@@ -1,99 +1,163 @@
 import Link from 'next/link'
+import { PetVisual } from '@/components/pet-visual'
+
+const features = [
+  { icon: '◉', title: 'Audio Analysis', text: 'Record or upload a dog or cat vocalization and get a cautious, evidence-based interpretation.' },
+  { icon: '◌', title: 'Species Analyzer', text: 'Use a photo for supported visual guidance, with uncertainty made explicit.' },
+  { icon: '⌂', title: 'Pet Profiles', text: 'Keep each pet’s context, language, and recurring signals connected.' },
+  { icon: '◷', title: 'Pet Memory', text: 'Review history, patterns, owner feedback, and changes over time.' },
+  { icon: '✓', title: 'Safe & Responsible', text: 'No diagnosis claims. PET AI shows uncertainty and recommends professional care when appropriate.' },
+]
 
 export default function Home() {
   return (
-    <main className="landing">
+    <main className="landing landing-v2">
       <div className="container landing-shell">
-        <header className="nav landing-nav">
-          <Link href="/" className="brand brand-lockup" aria-label="PET AI home">
-            <span className="brand-mark" aria-hidden="true">◒</span>
-            <span>PET AI</span>
+        <header className="landing-nav-v2">
+          <Link href="/" className="brand landing-brand" aria-label="PET AI home">
+            <span className="brand-mark brand-mark-paw" aria-hidden="true">✣</span>
+            <span><strong>PET AI</strong><small>Understand better.</small></span>
           </Link>
-          <nav className="nav-links"><Link href="/species">Species Analyzer</Link>
-            <Link href="/login">Sign in</Link>
-            <Link className="secondary small" href="/signup">Create account</Link>
+
+          <nav className="landing-main-nav" aria-label="Main navigation">
+            <a className="active" href="#home">Home</a>
+            <a href="#features">Features</a>
+            <a href="#how-it-works">How It Works</a>
+            <a href="#pricing">Pricing</a>
+            <a href="#about">About</a>
           </nav>
+
+          <div className="landing-nav-actions">
+            <button className="language-pill" type="button" aria-label="Language">EN <span>⌄</span></button>
+            <Link className="landing-signin" href="/login">Sign in</Link>
+            <Link className="primary landing-start" href="/signup">Get Started</Link>
+          </div>
         </header>
 
-        <section className="landing-hero">
-          <div className="hero-copy">
-            <div className="eyebrow landing-eyebrow"><span className="live-dot" /> AI-assisted pet communication</div>
-            <h1>Understand the little things your pet is trying to tell you.</h1>
-            <p className="hero-lede">Record a sound. Tell us what was happening. PET AI turns those signals into a thoughtful, probabilistic interpretation — personalized over time to your pet.</p>
-            <div className="actions hero-actions">
-              <Link className="primary hero-cta" href="/signup">Start with my pet <span>→</span></Link>
-              <Link className="secondary hero-secondary" href="/login">I already have an account</Link>
+        <section id="home" className="landing-hero-v2">
+          <div className="hero-copy-v2">
+            <div className="landing-kicker"><span className="live-dot" /> AI-assisted pet understanding</div>
+            <h1>Because<br />They Have<br />A Lot to Say</h1>
+            <div className="hero-accent" aria-hidden="true" />
+            <p className="hero-lede-v2">AI-powered insights into your pet’s sounds, behavior and emotions.</p>
+            <p className="hero-subline">Not a translator. A better way to understand.</p>
+
+            <div className="hero-actions-v2">
+              <Link className="primary hero-cta-v2" href="/signup">Get Started Free <span>→</span></Link>
+              <a className="secondary hero-video" href="#how-it-works"><span className="play-dot">▶</span> See how it works</a>
             </div>
-            <div className="hero-proof"><span><strong>2</strong> species</span><span><strong>2</strong> languages</span><span><strong>Private</strong> history</span></div><div className="trust-row">
-              <span>Dog + cat</span><i />
-              <span>English + Hindi</span><i />
-              <span>Built around uncertainty</span>
+
+            <div className="hero-trust-v2">
+              <span>✣ For dog &amp; cat parents</span>
+              <span>♢ Secure &amp; private</span>
+              <span>◈ No paid APIs</span>
+              <span>◎ English &amp; Hindi</span>
             </div>
           </div>
 
-          <div className="hero-visual-wrap"><div className="hero-orbit hero-orbit-one"/><div className="hero-orbit hero-orbit-two"/><div className="hero-spark spark-one">+</div><div className="hero-spark spark-two">•</div><div className="pet-product-card" aria-label="Example PET AI interpretation">
-            <div className="product-glow" />
-            <div className="pet-card-top">
+          <div className="hero-stage-v2" aria-label="PET AI product preview">
+            <div className="hero-note hero-note-one">“Woof?<br />Play?<br />Hungry?”</div>
+            <div className="hero-note hero-note-two">“Meow?<br />Happy?<br />Comfort?”</div>
+            <div className="hero-quote">“Same love.<br /><em>A deeper understanding.</em>” ♡</div>
+
+            <div className="hero-pet hero-pet-dog"><PetVisual species="dog" size="lg" label="Dog illustration" /></div>
+            <div className="hero-pet hero-pet-cat"><PetVisual species="cat" size="md" label="Cat illustration" /></div>
+
+            <div className="phone-mockup" aria-hidden="true">
+              <div className="phone-notch" />
+              <div className="phone-brand">✣ <strong>PET AI</strong></div>
+              <div className="phone-recording">Recording<span>...</span></div>
+              <div className="phone-wave"><i /><i /><i /><i /><i /><i /><i /><i /><i /><i /><i /></div>
+              <div className="phone-mic">●</div>
+              <strong className="phone-time">00:12</strong>
+              <small>Listening to your pet...</small>
+            </div>
+
+            <div className="interpretation-popover">
+              <div className="popover-avatar">🐶</div>
               <div>
-                <span className="tiny-label">TODAY WITH</span>
-                <strong>Bruno</strong>
+                <strong>Your pet may be excited!</strong>
+                <span>✓ High energy vocalization</span>
+                <span>✓ Possible play behavior</span>
+                <small>Confidence: 78%</small>
               </div>
-              <span className="status-pill"><span className="status-dot" /> Ready</span>
-            </div>
-            <div className="pet-avatar" aria-hidden="true">
-              <div className="avatar-ear left" />
-              <div className="avatar-ear right" />
-              <div className="avatar-face"><span className="eye left-eye" /><span className="eye right-eye" /><span className="nose" /></div>
-            </div>
-            <div className="listening-card">
-              <div className="wave" aria-hidden="true"><span /><span /><span /><span /><span /><span /><span /><span /><span /><span /><span /></div>
-              <div className="listening-copy"><span className="tiny-label">LAST SIGNAL</span><strong>Bruno may be asking for attention</strong><small>Confidence 78% · 14:32</small></div>
-            </div>
-            <div className="product-actions"><span className="mini-chip">Attention seeking</span><span className="mini-chip">Engaged</span><Link href="/signup" className="round-arrow">→</Link></div>
-          </div></div>
-        </section>
-
-
-        <section className="capabilities-section" aria-labelledby="capabilities-title">
-          <div className="section-heading"><div><div className="eyebrow">More than voice analysis</div><h2 id="capabilities-title">One place to know your pet better.</h2></div><p>Explore sounds, identify your pet, and build a private history around the moments that matter.</p></div>
-          <div className="capability-grid">
-            <article className="capability-card capability-dark"><span className="capability-number">01</span><div><h3>Understand a sound</h3><p>Record or upload a cat or dog vocalization. PET AI combines acoustic evidence with your context to produce cautious hypotheses.</p><Link href="/analyze">Analyze a sound <span>→</span></Link></div></article>
-            <article className="capability-card"><span className="capability-number">02</span><div><h3>Know your pet</h3><p>Take a photo or upload one for a visual estimate, then open an A–Z species card with traits, care guidance, behavior, and things to watch for.</p><Link href="/species">Open Species Analyzer <span>→</span></Link></div></article>
-            <article className="capability-card"><span className="capability-number">03</span><div><h3>Learn over time</h3><p>Keep interpretations, owner feedback, and recurring observations connected to each pet in a private history.</p><Link href="/history">View pet memory <span>→</span></Link></div></article>
-          </div>
-        </section>
-
-        <section className="try-section" aria-labelledby="try-title">
-          <div className="try-card"><div><div className="eyebrow">Try it without recording</div><h2 id="try-title">Start with a real cat or dog sample.</h2><p>Use PET AI's curated demo sounds to experience the analysis flow before recording your own pet.</p></div><div className="try-actions"><Link className="secondary" href="/analyze">Try a sample <span>→</span></Link><Link className="primary" href="/signup">Create my pet <span>→</span></Link></div></div>
-        </section>
-
-        <section className="how-section">
-          <div className="section-heading"><div><div className="eyebrow">A simpler way to understand them</div><h2>From sound to a useful hypothesis.</h2></div><p>PET AI keeps the experience simple while keeping the science honest.</p></div>
-          <div className="product-steps">
-            <article className="product-step"><span className="step-icon">01</span><div><h3>Capture the moment</h3><p>Record a vocalization or upload one. Add a little context about what was happening.</p></div></article>
-            <article className="product-step featured-step"><span className="step-icon">02</span><div><h3>See what it may mean</h3><p>Audio signals and context become ranked hypotheses, confidence, alternatives, and evidence.</p></div><div className="hypothesis-pill">Likely intent <strong>Attention</strong></div></article>
-            <article className="product-step"><span className="step-icon">03</span><div><h3>Teach it about your pet</h3><p>Your feedback helps PET AI recognize recurring patterns without turning guesses into facts.</p></div></article>
-          </div>
-        </section>
-
-        <section className="memory-section">
-          <div className="memory-card">
-            <div className="memory-copy"><div className="eyebrow">Your pet, not a generic model</div><h2>PET AI gets more useful as you use it.</h2><p>Patterns stay connected to your pet: what happened, what PET AI predicted, and what you confirmed. Over time, that creates a more personal interaction history.</p><Link href="/signup" className="text-link">Create Bruno's profile <span>→</span></Link></div>
-            <div className="memory-timeline">
-              <div className="memory-line" />
-              <div className="memory-event"><span className="memory-dot" /><div><small>Today</small><strong>Attention-seeking pattern</strong><p>3 similar evening signals</p></div></div>
-              <div className="memory-event"><span className="memory-dot" /><div><small>Yesterday</small><strong>Greeting pattern</strong><p>Confirmed by you</p></div></div>
-              <div className="memory-event"><span className="memory-dot" /><div><small>Earlier</small><strong>New pet profile</strong><p>Bruno joined PET AI</p></div></div>
+              <span className="popover-arrow">→</span>
             </div>
           </div>
         </section>
 
-        <section className="safety-section">
+        <section className="landing-stats" aria-label="PET AI capabilities">
+          <div><strong>2</strong><span>Species</span></div>
+          <div><strong>50K+</strong><span>Potential signal patterns</span></div>
+          <div><strong>2</strong><span>Languages (EN / HI)</span></div>
+          <div><strong>100%</strong><span>Private history</span></div>
+          <div><strong>∞</strong><span>Deeper bond</span></div>
+        </section>
+
+        <section id="features" className="landing-feature-section">
+          <div className="landing-section-title">
+            <div><span className="eyebrow">Everything in one place</span><h2>Everything You Need<br />to Understand Better</h2></div>
+            <p>Powerful tools designed for modern pet parents.</p>
+          </div>
+          <div className="feature-grid-v2">
+            {features.map((feature) => (
+              <article className="feature-card-v2" key={feature.title}>
+                <span className="feature-icon-v2">{feature.icon}</span>
+                <h3>{feature.title}</h3>
+                <p>{feature.text}</p>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section id="how-it-works" className="understanding-section">
+          <div className="understanding-visual">
+            <div className="dashboard-phone">
+              <div className="mini-notch" />
+              <div className="mini-brand">✣ PET AI</div>
+              <div className="mini-profile"><PetVisual species="dog" size="sm" /><div><strong>Bruno</strong><small>Golden Retriever</small></div></div>
+              <div className="mini-menu"><span>◉ New Analysis</span><span>◷ History</span><span>▥ Insights</span><span>♡ Care Tips</span><span>⚙ Settings</span></div>
+            </div>
+            <div className="photo-card-v2"><PetVisual species="dog" size="md" label="Dog illustration" /><p>“He may not speak<br />our language, but<br />he speaks to our hearts.”</p><span>♡</span></div>
+          </div>
+          <div className="understanding-copy">
+            <span className="eyebrow">Built for a happier, healthier tomorrow</span>
+            <h2>Understand more.<br />Respond better.</h2>
+            <p>Whether it’s a bark, a meow, or a curious sound — PET AI helps you understand what your pet may be feeling, so you can respond with more care, confidence and love.</p>
+            <ul>
+              <li>Understand behavior and emotional signals</li>
+              <li>Track changes and recurring patterns</li>
+              <li>Get personalized insights over time</li>
+              <li>Available in English &amp; Hindi</li>
+              <li>No paid AI APIs — local-first intelligence</li>
+              <li>Your pet data stays private</li>
+            </ul>
+            <Link className="primary landing-start" href="/signup">Get Started Free <span>→</span></Link>
+          </div>
+        </section>
+
+        <section id="pricing" className="simple-cta-section">
+          <div>
+            <span className="eyebrow">Start understanding today</span>
+            <h2>Your pet is already talking.<br />Start listening.</h2>
+            <p>Create your pet profile and explore PET AI’s analysis workflow.</p>
+          </div>
+          <div className="simple-cta-actions">
+            <Link className="primary landing-start" href="/signup">Create Free Account <span>→</span></Link>
+            <Link className="secondary" href="/login">Sign in</Link>
+          </div>
+        </section>
+
+        <section id="about" className="landing-safety-v2">
           <div className="safety-mark">i</div>
           <div><strong>Useful, not overconfident.</strong><p>PET AI does not claim to literally translate animal language or diagnose medical conditions. Persistent, unusual, or severe distress should be assessed by a qualified veterinarian.</p></div>
         </section>
 
-        <footer className="landing-footer"><span>PET AI</span><span>AI-assisted · probabilistic · pet-specific</span></footer>
+        <footer className="landing-footer-v2">
+          <div className="footer-brand"><span className="brand-mark brand-mark-paw">✣</span><strong>PET AI</strong><small>Understand better.</small></div>
+          <nav><a href="#about">About</a><a href="#about">Privacy</a><a href="#about">Terms</a><a href="#about">Support</a><a href="#how-it-works">How It Works</a></nav>
+          <div className="footer-social"><span>𝕏</span><span>◎</span><span>▶</span><span>in</span><small>A Spunky Tech Product</small></div>
+        </footer>
       </div>
     </main>
   )
