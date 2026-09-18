@@ -88,7 +88,7 @@ export function AudioRecorder({ onAudioReady, disabled = false }: Props) {
         </div>
         <div className="recorder-timer" aria-live="polite">{String(Math.floor(seconds / 60)).padStart(2,'0')}:{String(seconds % 60).padStart(2,'0')}</div>
       </div>
-      <div className="recorder-wave" aria-hidden="true">{Array.from({length:18},(_,i)=><i key={i} style={{'--wave': (8 + ((i * 17) % 25)) + 'px'} as React.CSSProperties} />)}</div>
+      <div className="recorder-wave" aria-hidden="true">{Array.from({ length: 18 }, (_, i) => <i key={i} style={{ height: String(8 + ((i * 17) % 25)) + 'px' }} />)}</div>
       <button className={recording ? 'secondary recorder-button' : 'primary recorder-button'} onClick={recording ? stop : start} disabled={disabled} type="button">
         <span className={'recorder-button-dot ' + (recording ? 'stop' : '')} aria-hidden="true" />
         {recording ? 'Stop recording' : 'Record pet sound'}
