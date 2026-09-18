@@ -2,7 +2,7 @@ type Props = { species: 'dog' | 'cat'; size?: 'sm' | 'md' | 'lg'; label?: string
 
 export function PetVisual({ species, size = 'md', label }: Props) {
   return (
-    <div className={\`pet-visual pet-visual-\${species} pet-visual-\${size}\`} role={label ? 'img' : undefined} aria-label={label}>
+    <div className={`pet-visual pet-visual-${species} pet-visual-${size}`} role={label ? 'img' : undefined} aria-label={label}>
       <svg viewBox="0 0 240 240" aria-hidden="true" focusable="false">
         {species === 'dog' ? <>
           <path className="pet-ear pet-ear-left" d="M54 76C22 42 27 18 62 34c22 10 31 30 29 48z" />
