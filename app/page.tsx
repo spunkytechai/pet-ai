@@ -88,7 +88,7 @@ export default function Home() {
 
         <section className="landing-stats" aria-label="PET AI capabilities">
           <div><strong>2</strong><span>Species</span></div>
-          <div><strong>50K+</strong><span>Potential signal patterns</span></div>
+          <div><strong>Local</strong><span>Acoustic signal analysis</span></div>
           <div><strong>2</strong><span>Languages (EN / HI)</span></div>
           <div><strong>100%</strong><span>Private history</span></div>
           <div><strong>∞</strong><span>Deeper bond</span></div>
