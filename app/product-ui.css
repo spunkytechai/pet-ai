@@ -300,3 +300,41 @@ textarea{resize:vertical}
  .pet-visual-sm{width:100px;height:100px}
  .pet-tile{padding-right:24px}
 }
+
+/* Mobile app shell v1 */
+.mobile-nav-icon,.mobile-bottom-nav{display:none}
+@media(max-width:800px){
+  body{padding-bottom:78px}
+  .app-nav{height:72px;min-height:72px;border-bottom:1px solid rgba(23,23,23,.08)}
+  .app-nav-main{display:block;min-width:0}
+  .app-nav-links{display:none}
+  .app-nav-actions{position:absolute;right:14px;top:17px}
+  .app-nav-actions .app-add-pet{display:none}
+  .app-nav-actions .logout-button,.app-nav-actions button{min-height:36px}
+  .app-nav .brand{gap:7px}
+  .app-nav .brand-mark{width:29px;height:29px}
+  .app-nav .brand>span:last-of-type{font-size:19px}
+  .mobile-bottom-nav{
+    display:grid;grid-template-columns:repeat(5,1fr);position:fixed;z-index:50;left:10px;right:10px;bottom:10px;
+    min-height:64px;padding:6px;border:1px solid rgba(23,23,23,.1);border-radius:22px;
+    background:rgba(255,253,247,.92);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+    box-shadow:0 16px 45px rgba(25,22,17,.16);padding-bottom:max(6px,env(safe-area-inset-bottom))
+  }
+  .mobile-bottom-nav a{min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border-radius:16px;text-decoration:none;color:#8b877e}
+  .mobile-bottom-nav a>span{font-size:19px;line-height:1;font-weight:700}
+  .mobile-bottom-nav a small{font-size:8px;font-weight:800;letter-spacing:.03em}
+  .mobile-bottom-nav a.active{background:#171717;color:#fff}
+  .mobile-bottom-nav .mobile-bottom-add{background:#ebe6dc;color:#171717;margin-left:2px}
+  .mobile-bottom-nav .mobile-bottom-add>span{width:24px;height:24px;display:grid;place-items:center;border-radius:8px;background:#171717;color:#fff}
+  .dashboard-page .container,.app-page .container{width:min(100% - 28px,1120px)}
+  .dashboard-hero{padding-top:35px}
+  .pet-grid{gap:10px}
+  .pet-tile{min-height:145px}
+  .pet-tile-copy{max-width:62%}
+  .pet-profile-hero{padding-top:32px}
+  .workbench{padding-bottom:34px}
+  .result-card{margin-bottom:4px}
+}
+@media(min-width:801px){
+  .app-nav-main .app-nav-links{display:flex}
+}
