@@ -13,27 +13,42 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
+  const [googleBusy, setGoogleBusy] = useState(false)
+
+  async function signInWithGoogle() {
+    setGoogleBusy(true)
+    setError('')
+    try {
+      const supabase = createClient()
+      const next = safeNextPath(new URLSearchParams(window.location.search).get('next'))
+      const redirectTo = `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: { redirectTo },
+      })
+      if (error) setError(error.message)
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : 'Unable to continue with Google. Please try again.')
+    } finally {
+      setGoogleBusy(false)
+    }
+  }
 
   async function submit(event: FormEvent) {
     event.preventDefault()
     setBusy(true)
     setError('')
-
     try {
       const supabase = createClient()
       const result = await Promise.race([
         supabase.auth.signInWithPassword({ email, password }),
-        new Promise<never>((_, reject) =>
-          window.setTimeout(() => reject(new Error('Authentication request timed out. Please check your connection and try again.')), 15000),
-        ),
+        new Promise<never>((_, reject) => window.setTimeout(() => reject(new Error('Authentication request timed out. Please check your connection and try again.')), 15000)),
       ])
-
       const { error } = result
       if (error) {
         setError(error.message)
         return
       }
-
       const next = safeNextPath(new URLSearchParams(window.location.search).get('next'))
       window.location.replace(next)
       return
@@ -44,5 +59,22 @@ export default function LoginPage() {
     }
   }
 
-  return <main><div className="container"><section className="card auth-card"><div className="eyebrow">PET AI</div><h1>Welcome back</h1><p className="muted">Sign in to analyze your pet’s signals and build its private pattern memory.</p><form onSubmit={submit}><label>Email<input type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} /></label><label>Password<input type="password" autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} /></label>{error && <p className="safety">{error}</p>}<button className="primary" disabled={busy}>{busy ? 'Signing in…' : 'Sign in'}</button></form><p className="muted">New to PET AI? <a href="/signup">Create an account</a></p></section></div></main>
+  return (
+    <main><div className="container"><section className="card auth-card">
+      <div className="eyebrow">PET AI</div>
+      <h1>Welcome back</h1>
+      <p className="muted">Sign in to analyze your pet’s signals and build its private pattern memory.</p>
+      <button type="button" className="secondary" onClick={signInWithGoogle} disabled={busy || googleBusy}>
+        {googleBusy ? 'Connecting…' : 'Continue with Google'}
+      </button>
+      <div className="auth-divider"><span>or</span></div>
+      <form onSubmit={submit}>
+        <label>Email<input type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} /></label>
+        <label>Password<input type="password" autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} /></label>
+        {error && <p className="safety">{error}</p>}
+        <button className="primary" disabled={busy || googleBusy}>{busy ? 'Signing in…' : 'Sign in'}</button>
+      </form>
+      <p className="muted">New to PET AI? <a href="/signup">Create an account</a></p>
+    </section></div></main>
+  )
 }
