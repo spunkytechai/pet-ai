@@ -32,21 +32,24 @@ export async function POST(request: Request) {
 
   const recordingId = crypto.randomUUID()
   const interpretationId = crypto.randomUUID()
-  const extension = audio.name.includes('.') ? audio.name.split('.').pop()?.toLowerCase() : 'webm'
-  const safeExtension = extension && /^[a-z0-9]+$/.test(extension) ? extension : 'webm'
-  const storagePath = user.id + '/' + pet.id + '/' + recordingId + '.' + safeExtension
+  const storagePath = user.id + '/' + pet.id + '/' + recordingId + '.wav'
   const bytes = new Uint8Array(await audio.arrayBuffer())
 
-  const { error: uploadError } = await supabase.storage.from('pet-recordings').upload(storagePath, bytes, { contentType: audio.type, upsert: false })
+  const { error: uploadError } = await supabase.storage.from('pet-recordings').upload(storagePath, bytes, { contentType: 'audio/wav', upsert: false })
   if (uploadError) return NextResponse.json({ error: 'Audio could not be securely stored.' }, { status: 500 })
 
-  const { error: recordingError } = await supabase.from('recordings').insert({ id: recordingId, pet_id: pet.id, storage_path: storagePath, mime_type: audio.type })
+  const { error: recordingError } = await supabase.from('recordings').insert({ id: recordingId, pet_id: pet.id, storage_path: storagePath, mime_type: 'audio/wav' })
   if (recordingError) {
     await supabase.storage.from('pet-recordings').remove([storagePath])
     return NextResponse.json({ error: 'Recording metadata could not be saved.' }, { status: 500 })
   }
 
   const features = extractWavFeatures(bytes)
+  if (!features) {
+    await supabase.storage.from('pet-recordings').remove([storagePath])
+    await supabase.from('recordings').delete().eq('id', recordingId)
+    return NextResponse.json(abstain('Audio could not be decoded as the required PCM WAV format. Please record again or re-upload the audio.'), { status: 422 })
+  }
   const localModel = getLocalAudioModel()
   let modelInterpretation: Interpretation | null = null
   if (localModel) {
@@ -67,7 +70,7 @@ export async function POST(request: Request) {
     context,
     language: language as 'en' | 'hi',
     audioBytes: audio.size,
-    audioMime: audio.type,
+    audioMime: 'audio/wav',
     features,
   })
 
