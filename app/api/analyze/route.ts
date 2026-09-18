@@ -25,11 +25,7 @@ export async function POST(request: Request) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Authentication required.' }, { status: 401 })
 
-  const { data: pet, error: petLookupError } = await supabase
-    .from('pets')
-    .select('id,name,species')
-    .eq('id', petId)
-    .single()
+  const { data: pet, error: petLookupError } = await supabase.from('pets').select('id,name,species').eq('id', petId).single()
   if (petLookupError || !pet) return NextResponse.json({ error: 'Pet profile not found.' }, { status: 404 })
 
   const recordingId = crypto.randomUUID()
@@ -37,20 +33,12 @@ export async function POST(request: Request) {
   const extension = audio.name.includes('.') ? audio.name.split('.').pop()?.toLowerCase() : 'webm'
   const safeExtension = extension && /^[a-z0-9]+$/.test(extension) ? extension : 'webm'
   const storagePath = user.id + '/' + pet.id + '/' + recordingId + '.' + safeExtension
-
   const bytes = new Uint8Array(await audio.arrayBuffer())
-  const { error: uploadError } = await supabase.storage.from('pet-recordings').upload(storagePath, bytes, {
-    contentType: audio.type,
-    upsert: false,
-  })
+
+  const { error: uploadError } = await supabase.storage.from('pet-recordings').upload(storagePath, bytes, { contentType: audio.type, upsert: false })
   if (uploadError) return NextResponse.json({ error: 'Audio could not be securely stored.' }, { status: 500 })
 
-  const { error: recordingError } = await supabase.from('recordings').insert({
-    id: recordingId,
-    pet_id: pet.id,
-    storage_path: storagePath,
-    mime_type: audio.type,
-  })
+  const { error: recordingError } = await supabase.from('recordings').insert({ id: recordingId, pet_id: pet.id, storage_path: storagePath, mime_type: audio.type })
   if (recordingError) {
     await supabase.storage.from('pet-recordings').remove([storagePath])
     return NextResponse.json({ error: 'Recording metadata could not be saved.' }, { status: 500 })
@@ -100,6 +88,8 @@ export async function POST(request: Request) {
       peak: features.peak,
       zeroCrossingRate: features.zeroCrossingRate,
       dynamicRange: features.dynamicRange,
+      crestFactor: features.crestFactor,
+      spectralCentroidHz: features.spectralCentroidHz,
       estimatedArousal: features.estimatedArousal,
       acousticQuality: features.acousticQuality,
       voiced: features.voiced,
