@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { abstain } from '@/lib/analysis'
-import { interpretPetAudio } from '@/lib/ai/pet-interpreter'
 import { interpretDeterministically } from '@/lib/ai/deterministic-interpreter'
 import { extractWavFeatures } from '@/lib/ai/audio-features'
 
@@ -57,15 +56,8 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Recording metadata could not be saved.' }, { status: 500 })
   }
 
-  const aiInterpretation = await interpretPetAudio({
-    audio,
-    species: pet.species as 'dog' | 'cat',
-    context,
-    language: language as 'en' | 'hi',
-  }).catch(() => null)
-
   const features = extractWavFeatures(bytes)
-  const interpretation = aiInterpretation || interpretDeterministically({
+  const interpretation = interpretDeterministically({
     species: pet.species as 'dog' | 'cat',
     context,
     language: language as 'en' | 'hi',
