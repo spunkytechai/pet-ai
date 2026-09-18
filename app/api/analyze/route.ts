@@ -4,6 +4,7 @@ import { abstain } from '@/lib/analysis'
 import { interpretDeterministically } from '@/lib/ai/deterministic-interpreter'
 import { getLocalAudioModel } from '@/lib/ai/local-model'
 import { extractWavFeatures } from '@/lib/ai/audio-features'
+import type { Interpretation } from '@/lib/analysis'
 
 const MAX_AUDIO_BYTES = 4 * 1024 * 1024
 
@@ -47,7 +48,20 @@ export async function POST(request: Request) {
 
   const features = extractWavFeatures(bytes)
   const localModel = getLocalAudioModel()
-  const modelInterpretation = localModel ? await localModel.analyze({ species: pet.species as 'dog' | 'cat', context, language: language as 'en' | 'hi', audio: bytes, features }).catch(() => null) : null
+  let modelInterpretation: Interpretation | null = null
+  if (localModel) {
+    try {
+      modelInterpretation = await Promise.resolve(localModel.analyze({
+        species: pet.species as 'dog' | 'cat',
+        context,
+        language: language as 'en' | 'hi',
+        audio: bytes,
+        features,
+      }))
+    } catch {
+      modelInterpretation = null
+    }
+  }
   const interpretation = modelInterpretation || interpretDeterministically({
     species: pet.species as 'dog' | 'cat',
     context,
