@@ -366,3 +366,19 @@ textarea{resize:vertical}
  .recorder-copy strong{font-size:18px}.recorder-copy p{font-size:10px}
  .recorder-timer{grid-column:2;font-size:22px;margin-top:-8px}
 }
+
+/* Results Visualization v3 */
+.evidence-panel{margin:18px 0 0;padding:18px;border:1px solid #34342e;border-radius:20px;background:rgba(255,255,255,.035)}
+.evidence-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:12px}
+.evidence-grid>div{padding:12px;border-radius:13px;background:rgba(255,255,255,.045)}
+.evidence-grid small{display:block;color:#99978f;font-size:8px;text-transform:uppercase;letter-spacing:.09em}
+.evidence-grid strong{display:block;margin-top:7px;font-size:14px;color:#fff;text-transform:capitalize}
+.result-card .interpretation-summary{box-shadow:inset 0 0 0 1px rgba(255,255,255,.04)}
+.result-grid>div{transition:transform .18s ease,border-color .18s ease}
+.result-grid>div:hover{transform:translateY(-2px);border-color:#55554d}
+.result-evidence-block p{line-height:1.55}
+@media(max-width:800px){
+ .evidence-grid{grid-template-columns:repeat(2,1fr)}
+ .evidence-grid>div:last-child{grid-column:1/-1}
+ .interpretation-summary{margin:18px 0}
+}
