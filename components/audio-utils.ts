@@ -1,7 +1,5 @@
 'use client'
 
-const SUPPORTED_INPUTS = new Set(['audio/mpeg', 'audio/mp3', 'audio/wav', 'audio/x-wav'])
-
 function writeAscii(view: DataView, offset: number, value: string) {
   for (let i = 0; i < value.length; i += 1) view.setUint8(offset + i, value.charCodeAt(i))
 }
@@ -23,7 +21,6 @@ function encodeWav(samples: Float32Array, sampleRate: number) {
   view.setUint16(34, 16, true)
   writeAscii(view, 36, 'data')
   view.setUint32(40, samples.length * bytesPerSample, true)
-
   let offset = 44
   for (let i = 0; i < samples.length; i += 1) {
     const sample = Math.max(-1, Math.min(1, samples[i]))
@@ -33,15 +30,20 @@ function encodeWav(samples: Float32Array, sampleRate: number) {
   return new Blob([buffer], { type: 'audio/wav' })
 }
 
+// Convert every browser/upload format into mono, 16 kHz, 16-bit PCM WAV.
+// The server feature extractor intentionally consumes only this canonical format.
 export async function normalizeAudioForAnalysis(file: File) {
-  if (SUPPORTED_INPUTS.has(file.type.toLowerCase()) || /\.(mp3|wav)$/i.test(file.name)) return file
-
   const AudioContextCtor = window.AudioContext || window.webkitAudioContext
-  if (!AudioContextCtor) throw new Error('This browser cannot convert the recorded audio to a supported format.')
+  if (!AudioContextCtor) throw new Error('This browser cannot convert audio to PET AI supported analysis format.')
 
   const sourceContext = new AudioContextCtor()
   try {
-    const decoded = await sourceContext.decodeAudioData(await file.arrayBuffer())
+    let decoded: AudioBuffer
+    try {
+      decoded = await sourceContext.decodeAudioData(await file.arrayBuffer())
+    } catch {
+      throw new Error('This audio format could not be decoded. Please record again or choose a WAV, MP3, M4A, or WebM file your browser can play.')
+    }
     const targetRate = 16000
     const targetLength = Math.max(1, Math.ceil(decoded.duration * targetRate))
     const offline = new OfflineAudioContext(1, targetLength, targetRate)
@@ -51,7 +53,7 @@ export async function normalizeAudioForAnalysis(file: File) {
     source.start(0)
     const rendered = await offline.startRendering()
     const wav = encodeWav(rendered.getChannelData(0), targetRate)
-    return new File([wav], `pet-signal-${Date.now()}.wav`, { type: 'audio/wav' })
+    return new File([wav], 'pet-signal-' + Date.now() + '.wav', { type: 'audio/wav' })
   } finally {
     await sourceContext.close().catch(() => undefined)
   }
