@@ -1,5 +1,7 @@
 # PET AI
 
+[![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
+
 **AI-assisted pet communication.**
 
 PET AI is a privacy-first web application that helps owners explore what a dog or cat vocalization may be expressing. It combines a pet profile, audio capture, contextual information and owner feedback to produce structured, probabilistic interpretations.
@@ -91,3 +93,7 @@ The repository is connected to the PET AI Vercel project. Changes pushed to `mai
 ## Safety and research
 
 PET AI should communicate uncertainty rather than inventing certainty. Persistent, unusual or severe distress should be assessed by a qualified veterinarian. Research datasets must be reviewed for license, provenance, consent and commercial-use restrictions before entering any production training pipeline.
+
+## License
+
+PET AI is licensed under the [Apache License 2.0](LICENSE).
