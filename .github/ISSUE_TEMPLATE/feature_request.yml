@@ -1,0 +1,32 @@
+name: Feature request
+description: Suggest a PET AI product or developer experience improvement.
+title: "[Feature]: "
+labels: ["enhancement", "needs-triage"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem to solve
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence, evaluation, or research
+      description: Include public sources only. Do not upload private recordings or identifiable owner data.
+    validations:
+      required: false
+  - type: checkboxes
+    id: safeguards
+    attributes:
+      label: Safety considerations
+      options:
+        - label: I have considered privacy, consent, and retention of audio data.
+        - label: I have considered uncertainty and the risk of presenting an interpretation as fact.
+        - label: I understand PET AI is not a veterinary diagnostic system.
